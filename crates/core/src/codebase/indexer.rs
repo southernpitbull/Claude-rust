@@ -245,11 +245,51 @@ impl CodebaseIndex {
         Ok(())
     }
 
+    /// Save index to file with compression
+    pub async fn save_compressed<P: AsRef<Path>>(&self, path: P) -> AppResult<()> {
+        use flate2::write::GzEncoder;
+        use flate2::Compression;
+        use std::io::Write;
+
+        let json = self.to_json()?;
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(json.as_bytes()).map_err(|e| {
+            AppError::io_error(format!("Failed to compress index: {}", e))
+        })?;
+        let compressed = encoder.finish().map_err(|e| {
+            AppError::io_error(format!("Failed to finish compression: {}", e))
+        })?;
+
+        fs::write(path.as_ref(), compressed).await.map_err(|e| {
+            AppError::io_error(format!("Failed to write compressed index to file: {}", e))
+        })?;
+
+        Ok(())
+    }
+
     /// Load index from file
     pub async fn load<P: AsRef<Path>>(path: P) -> AppResult<Self> {
         let json = fs::read_to_string(path.as_ref()).await.map_err(|e| {
             AppError::io_error(format!("Failed to read index from file: {}", e))
         })?;
+        Self::from_json(&json)
+    }
+
+    /// Load index from compressed file
+    pub async fn load_compressed<P: AsRef<Path>>(path: P) -> AppResult<Self> {
+        use flate2::read::GzDecoder;
+        use std::io::Read;
+
+        let compressed = fs::read(path.as_ref()).await.map_err(|e| {
+            AppError::io_error(format!("Failed to read compressed index from file: {}", e))
+        })?;
+
+        let mut decoder = GzDecoder::new(&compressed[..]);
+        let mut json = String::new();
+        decoder.read_to_string(&mut json).map_err(|e| {
+            AppError::io_error(format!("Failed to decompress index: {}", e))
+        })?;
+
         Self::from_json(&json)
     }
 

@@ -56,6 +56,8 @@ pub struct ScannerConfig {
     pub max_file_size: Option<u64>, // in bytes
     pub file_extensions: Option<Vec<String>>,
     pub exclude_patterns: Vec<String>,
+    pub max_depth: Option<usize>, // Maximum directory depth
+    pub follow_symlinks: bool, // Follow symbolic links
 }
 
 impl Default for ScannerConfig {
@@ -71,6 +73,8 @@ impl Default for ScannerConfig {
                 "dist".to_string(),
                 "build".to_string(),
             ],
+            max_depth: None, // No depth limit by default
+            follow_symlinks: false, // Don't follow symlinks by default
         }
     }
 }
@@ -103,7 +107,13 @@ impl CodebaseScanner {
             .git_ignore(true)
             .git_global(true)
             .git_exclude(true)
-            .hidden(!self.config.include_hidden);
+            .hidden(!self.config.include_hidden)
+            .follow_links(self.config.follow_symlinks);
+
+        // Set max depth if specified
+        if let Some(max_depth) = self.config.max_depth {
+            walk_builder.max_depth(Some(max_depth));
+        }
 
         // Add exclude patterns
         let exclude_patterns = self.config.exclude_patterns.clone();
@@ -148,6 +158,12 @@ impl CodebaseScanner {
                             }
                         }
 
+                        // Check if binary file
+                        if self.is_binary(entry.path()).await {
+                            debug!("Skipping binary file: {:?}", entry.path());
+                            continue;
+                        }
+
                         // Read file content
                         match self.read_file(entry.path()).await {
                             Ok(content) => {
@@ -179,8 +195,20 @@ impl CodebaseScanner {
     async fn read_file<P: AsRef<Path>>(&self, path: P) -> CodebaseResult<String> {
         let content = fs::read_to_string(path).await
             .map_err(|e| CodebaseError::Io(e))?;
-        
+
         Ok(content)
+    }
+
+    /// Check if file is binary by reading first few bytes
+    async fn is_binary<P: AsRef<Path>>(&self, path: P) -> bool {
+        match fs::read(path).await {
+            Ok(bytes) => {
+                // Check first 8KB for null bytes
+                let sample_size = bytes.len().min(8192);
+                bytes[..sample_size].contains(&0)
+            }
+            Err(_) => true, // Treat unreadable files as binary
+        }
     }
 
     /// Detect programming language from file extension
