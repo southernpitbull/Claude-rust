@@ -176,7 +176,29 @@ impl CodebaseIndex {
 
     /// Find symbols by name pattern
     pub fn find_symbols_pattern(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
-        let regex = Regex::new(pattern)
+        self.find_symbols_pattern_with_options(pattern, true, false)
+    }
+
+    /// Find symbols by name pattern with search options
+    pub fn find_symbols_pattern_with_options(
+        &self,
+        pattern: &str,
+        case_sensitive: bool,
+        whole_word: bool,
+    ) -> AppResult<Vec<&Symbol>> {
+        // Build regex pattern with options
+        let mut regex_pattern = if whole_word {
+            format!(r"\b{}\b", regex::escape(pattern))
+        } else {
+            pattern.to_string()
+        };
+
+        // Add case-insensitive flag if needed
+        if !case_sensitive {
+            regex_pattern = format!("(?i){}", regex_pattern);
+        }
+
+        let regex = Regex::new(&regex_pattern)
             .map_err(|e| AppError::validation_error(format!("Invalid regex pattern: {}", e)))?;
 
         let mut results = Vec::new();
@@ -187,6 +209,21 @@ impl CodebaseIndex {
         }
 
         Ok(results)
+    }
+
+    /// Find symbols with case-sensitive search
+    pub fn find_symbols_case_sensitive(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
+        self.find_symbols_pattern_with_options(pattern, true, false)
+    }
+
+    /// Find symbols with case-insensitive search
+    pub fn find_symbols_case_insensitive(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
+        self.find_symbols_pattern_with_options(pattern, false, false)
+    }
+
+    /// Find symbols matching whole word only
+    pub fn find_symbols_whole_word(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
+        self.find_symbols_pattern_with_options(pattern, true, true)
     }
 
     /// Find symbols by kind
@@ -698,5 +735,69 @@ pub struct Struct1 {}
 
         assert_eq!(hash1, hash2);
         assert_ne!(hash1, hash3);
+    }
+
+    #[tokio::test]
+    async fn test_case_sensitive_search() {
+        let content = r#"
+pub fn TestFunc() {}
+pub fn testfunc() {}
+pub fn TESTFUNC() {}
+"#;
+
+        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
+        let mut index = CodebaseIndex::new();
+        index.index_file(&file_path).await.unwrap();
+
+        // Case-sensitive search should find exact match only
+        let results = index.find_symbols_case_sensitive("TestFunc").unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].name, "TestFunc");
+
+        // Case-insensitive search should find all variations
+        let results = index.find_symbols_case_insensitive("testfunc").unwrap();
+        assert_eq!(results.len(), 3);
+    }
+
+    #[tokio::test]
+    async fn test_whole_word_search() {
+        let content = r#"
+pub fn test() {}
+pub fn testing() {}
+pub fn test_func() {}
+pub fn my_test_func() {}
+"#;
+
+        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
+        let mut index = CodebaseIndex::new();
+        index.index_file(&file_path).await.unwrap();
+
+        // Whole word search should only match exact word boundaries
+        let results = index.find_symbols_whole_word("test").unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].name, "test");
+
+        // Pattern search without whole word should match partial
+        let results = index.find_symbols_pattern("test").unwrap();
+        assert!(results.len() >= 1);
+    }
+
+    #[tokio::test]
+    async fn test_combined_search_options() {
+        let content = r#"
+pub fn Test() {}
+pub fn test() {}
+pub fn Testing() {}
+"#;
+
+        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
+        let mut index = CodebaseIndex::new();
+        index.index_file(&file_path).await.unwrap();
+
+        // Case-insensitive + whole word
+        let results = index
+            .find_symbols_pattern_with_options("test", false, true)
+            .unwrap();
+        assert_eq!(results.len(), 2); // Test and test, but not Testing
     }
 }

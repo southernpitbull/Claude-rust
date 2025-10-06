@@ -892,8 +892,8 @@
 #### 13.3.2 Text Search
 - [x] Full-text search (via indexer)
 - [x] Regex search (find_symbols_pattern)
-- [~] Case-sensitive search
-- [~] Whole-word search
+- [x] Case-sensitive search (find_symbols_case_sensitive, find_symbols_case_insensitive)
+- [x] Whole-word search (find_symbols_whole_word, with word boundary regex)
 - [x] Show context
 
 #### 13.3.3 Semantic Search

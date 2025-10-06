@@ -375,7 +375,7 @@ mod tests {
 
         // Execute failing operations
         for _ in 0..3 {
-            let _ = breaker
+            let _: Result<(), AppError> = breaker
                 .execute(|| async { Err(AppError::Internal {
                     message: "test error".to_string(),
                     source: None,
@@ -401,7 +401,7 @@ mod tests {
 
         // Open the circuit
         for _ in 0..3 {
-            let _ = breaker
+            let _: Result<(), AppError> = breaker
                 .execute(|| async { Err(AppError::Internal {
                     message: "test error".to_string(),
                     source: None,
@@ -416,7 +416,7 @@ mod tests {
 
         // Execute successful operations
         for _ in 0..2 {
-            let _ = breaker.execute(|| async { Ok(()) }).await;
+            let _: Result<(), AppError> = breaker.execute(|| async { Ok(()) }).await;
         }
 
         // Circuit should be closed
@@ -433,9 +433,9 @@ mod tests {
         let breaker = CircuitBreaker::new(config);
 
         // Execute some operations
-        let _ = breaker.execute(|| async { Ok(()) }).await;
-        let _ = breaker.execute(|| async { Ok(()) }).await;
-        let _ = breaker
+        let _: Result<(), AppError> = breaker.execute(|| async { Ok(()) }).await;
+        let _: Result<(), AppError> = breaker.execute(|| async { Ok(()) }).await;
+        let _: Result<(), AppError> = breaker
             .execute(|| async { Err(AppError::Internal {
                 message: "test error".to_string(),
                 source: None,
