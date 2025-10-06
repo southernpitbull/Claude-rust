@@ -148,6 +148,10 @@ pub enum Commands {
     /// Background tasks management
     #[command(subcommand)]
     Tasks(TasksCommands),
+
+    /// Agent management
+    #[command(subcommand)]
+    Agents(AgentsCommands),
 }
 
 /// Authentication commands
@@ -808,6 +812,63 @@ pub enum TasksCommands {
     },
 }
 
+/// Agents commands
+#[derive(Subcommand, Debug)]
+pub enum AgentsCommands {
+    /// List all agents
+    List {
+        /// Filter by type
+        #[arg(long)]
+        agent_type: Option<String>,
+
+        /// Filter by status
+        #[arg(long)]
+        status: Option<String>,
+    },
+
+    /// Show agent details
+    Show {
+        /// Agent ID
+        agent_id: String,
+    },
+
+    /// Register a new agent
+    Register {
+        /// Agent type (general/code-review/testing/documentation/refactoring/security-scan/performance/code-generation)
+        #[arg(long)]
+        agent_type: String,
+
+        /// Agent name
+        #[arg(long)]
+        name: String,
+
+        /// Capabilities (comma-separated)
+        #[arg(long)]
+        capabilities: Option<String>,
+    },
+
+    /// Unregister an agent
+    Unregister {
+        /// Agent ID
+        agent_id: String,
+    },
+
+    /// Pause an agent
+    Pause {
+        /// Agent ID
+        agent_id: String,
+    },
+
+    /// Resume a paused agent
+    Resume {
+        /// Agent ID
+        agent_id: String,
+    },
+
+    /// Show agent statistics
+    Stats,
+}
+
 /// CLI command handler
 pub struct CommandHandler;
 
@@ -853,6 +914,7 @@ impl CommandHandler {
             Commands::Mcp(mcp_cmd) => Self::handle_mcp_command(mcp_cmd).await?,
             Commands::Hooks(hooks_cmd) => Self::handle_hooks_command(hooks_cmd).await?,
             Commands::Tasks(tasks_cmd) => Self::handle_tasks_command(tasks_cmd).await?,
+            Commands::Agents(agents_cmd) => Self::handle_agents_command(agents_cmd).await?,
         }
 
         Ok(())
@@ -3806,6 +3868,234 @@ impl CommandHandler {
                     Err(e) => {
                         println!("❌ Failed to cancel task: {}", e);
                     }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Handle agents command
+    async fn handle_agents_command(command: AgentsCommands) -> Result<(), Box<dyn std::error::Error>> {
+        use claude_code_agents::{AgentRegistry, Agent, AgentType, AgentStatus};
+        use std::str::FromStr;
+
+        // Create global registry (in real implementation, this would be shared)
+        let registry = AgentRegistry::new(10);
+
+        match command {
+            AgentsCommands::List { agent_type, status } => {
+                println!("\n🤖 Agents:\n");
+
+                let mut agents = registry.list().await;
+
+                // Filter by type
+                if let Some(type_str) = agent_type {
+                    let filter_type = match type_str.to_lowercase().as_str() {
+                        "general" => AgentType::General,
+                        "code-review" => AgentType::CodeReview,
+                        "testing" => AgentType::Testing,
+                        "documentation" => AgentType::Documentation,
+                        "refactoring" => AgentType::Refactoring,
+                        "security-scan" => AgentType::SecurityScan,
+                        "performance" => AgentType::Performance,
+                        "code-generation" => AgentType::CodeGeneration,
+                        _ => {
+                            println!("❌ Invalid agent type");
+                            return Ok(());
+                        }
+                    };
+                    agents.retain(|a| a.agent_type == filter_type);
+                }
+
+                // Filter by status
+                if let Some(status_str) = status {
+                    let filter_status = match status_str.to_lowercase().as_str() {
+                        "idle" => AgentStatus::Idle,
+                        "busy" => AgentStatus::Busy,
+                        "paused" => AgentStatus::Paused,
+                        "error" => AgentStatus::Error,
+                        "stopped" => AgentStatus::Stopped,
+                        _ => {
+                            println!("❌ Invalid status");
+                            return Ok(());
+                        }
+                    };
+                    agents.retain(|a| a.status == filter_status);
+                }
+
+                if agents.is_empty() {
+                    println!("No agents found.");
+                    return Ok(());
+                }
+
+                // Group by type
+                for agent in agents {
+                    let status_icon = match agent.status {
+                        AgentStatus::Idle => "⚪",
+                        AgentStatus::Busy => "🟢",
+                        AgentStatus::Paused => "🟡",
+                        AgentStatus::Error => "🔴",
+                        AgentStatus::Stopped => "⚫",
+                    };
+
+                    println!(
+                        "  {} {} [{}] - {} ({}) - Tasks: {}/{} ",
+                        status_icon,
+                        agent.name,
+                        agent.agent_type,
+                        agent.id,
+                        agent.status,
+                        agent.tasks_completed,
+                        agent.tasks_failed
+                    );
+                }
+                println!();
+            }
+
+            AgentsCommands::Show { agent_id } => {
+                use uuid::Uuid;
+
+                let uuid = Uuid::from_str(&agent_id)
+                    .map_err(|_| "Invalid agent ID format")?;
+                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+
+                if let Some(agent) = registry.get(agent_id_parsed).await {
+                    println!("\n🤖 Agent Details:\n");
+                    println!("ID:           {}", agent.id);
+                    println!("Name:         {}", agent.name);
+                    println!("Type:         {}", agent.agent_type);
+                    println!("Status:       {}", agent.status);
+                    println!("Created:      {}", agent.created_at);
+
+                    if let Some(last_active) = agent.last_active {
+                        println!("Last Active:  {}", last_active);
+                    }
+
+                    if let Some(current_task) = agent.current_task {
+                        println!("Current Task: {}", current_task);
+                    }
+
+                    println!("\nStatistics:");
+                    println!("  Tasks Completed: {}", agent.tasks_completed);
+                    println!("  Tasks Failed:    {}", agent.tasks_failed);
+
+                    if !agent.capabilities.is_empty() {
+                        println!("\nCapabilities:");
+                        for cap in &agent.capabilities {
+                            println!("  • {}", cap);
+                        }
+                    }
+                } else {
+                    println!("❌ Agent not found: {}", agent_id);
+                }
+            }
+
+            AgentsCommands::Register { agent_type, name, capabilities } => {
+                let agent_type_parsed = match agent_type.to_lowercase().as_str() {
+                    "general" => AgentType::General,
+                    "code-review" => AgentType::CodeReview,
+                    "testing" => AgentType::Testing,
+                    "documentation" => AgentType::Documentation,
+                    "refactoring" => AgentType::Refactoring,
+                    "security-scan" => AgentType::SecurityScan,
+                    "performance" => AgentType::Performance,
+                    "code-generation" => AgentType::CodeGeneration,
+                    _ => {
+                        println!("❌ Invalid agent type: {}", agent_type);
+                        return Ok(());
+                    }
+                };
+
+                let mut agent = Agent::new(agent_type_parsed, name);
+
+                // Add capabilities if provided
+                if let Some(caps_str) = capabilities {
+                    for cap in caps_str.split(',') {
+                        agent.add_capability(cap.trim().to_string());
+                    }
+                }
+
+                match registry.register(agent).await {
+                    Ok(agent_id) => {
+                        println!("✅ Agent registered: {}", agent_id);
+                    }
+                    Err(e) => {
+                        println!("❌ Failed to register agent: {}", e);
+                    }
+                }
+            }
+
+            AgentsCommands::Unregister { agent_id } => {
+                use uuid::Uuid;
+
+                let uuid = Uuid::from_str(&agent_id)
+                    .map_err(|_| "Invalid agent ID format")?;
+                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+
+                match registry.unregister(agent_id_parsed).await {
+                    Ok(()) => {
+                        println!("✅ Agent unregistered: {}", agent_id);
+                    }
+                    Err(e) => {
+                        println!("❌ Failed to unregister agent: {}", e);
+                    }
+                }
+            }
+
+            AgentsCommands::Pause { agent_id } => {
+                use uuid::Uuid;
+
+                let uuid = Uuid::from_str(&agent_id)
+                    .map_err(|_| "Invalid agent ID format")?;
+                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+
+                if let Some(mut agent) = registry.get(agent_id_parsed).await {
+                    agent.pause();
+                    registry.update(agent).await;
+                    println!("✅ Agent paused: {}", agent_id);
+                } else {
+                    println!("❌ Agent not found: {}", agent_id);
+                }
+            }
+
+            AgentsCommands::Resume { agent_id } => {
+                use uuid::Uuid;
+
+                let uuid = Uuid::from_str(&agent_id)
+                    .map_err(|_| "Invalid agent ID format")?;
+                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+
+                if let Some(mut agent) = registry.get(agent_id_parsed).await {
+                    agent.resume();
+                    registry.update(agent).await;
+                    println!("✅ Agent resumed: {}", agent_id);
+                } else {
+                    println!("❌ Agent not found: {}", agent_id);
+                }
+            }
+
+            AgentsCommands::Stats => {
+                let stats = registry.stats().await;
+
+                println!("\n📊 Agent Statistics:\n");
+                println!("Total Agents:       {}", stats.total);
+                println!("\nBy Status:");
+                println!("  Idle:     {}", stats.idle);
+                println!("  Busy:     {}", stats.busy);
+                println!("  Paused:   {}", stats.paused);
+                println!("  Error:    {}", stats.error);
+                println!("  Stopped:  {}", stats.stopped);
+                println!("\nTasks:");
+                println!("  Completed: {}", stats.total_completed);
+                println!("  Failed:    {}", stats.total_failed);
+
+                if stats.total > 0 {
+                    let success_rate = if stats.total_completed + stats.total_failed > 0 {
+                        (stats.total_completed as f64 / (stats.total_completed + stats.total_failed) as f64) * 100.0
+                    } else {
+                        0.0
+                    };
+                    println!("\nSuccess Rate: {:.1}%", success_rate);
                 }
             }
         }

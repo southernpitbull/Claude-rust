@@ -20,6 +20,7 @@ claude-code-utils = { path = "../utils" }
 claude-code-mcp = { path = "../mcp" }
 claude-code-hooks = { path = "../hooks" }
 claude-code-tasks = { path = "../tasks" }
+claude-code-agents = { path = "../agents" }
 
 # Workspace dependencies
 tokio = { workspace = true }

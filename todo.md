@@ -2,13 +2,13 @@
 
 ## Progress Tracking
 
-**Overall Completion: ~58.1%**
+**Overall Completion: ~60.3%**
 
-- ✅ Complete: 370 items
+- ✅ Complete: 386 items
 - 🟡 In Progress: 47 items
-- 🔴 Not Started: 221 items
+- 🔴 Not Started: 207 items
 
-**Total Items: 638**
+**Total Items: 640**
 
 ---
 
@@ -773,28 +773,30 @@
 
 ## 12. Subagents & Background Tasks ✅
 
-### 12.1 Subagent Infrastructure 🔴
+### 12.1 Subagent Infrastructure ✅
 
 #### 12.1.1 Agent System
-- [ ] Design agent architecture
-- [ ] Create agent types
-- [ ] Implement agent registry
-- [ ] Add agent lifecycle management
-- [ ] Handle agent communication
+- [x] Design agent architecture
+- [x] Create agent types
+- [x] Implement agent registry
+- [x] Add agent lifecycle management
+- [x] Handle agent communication
 
 #### 12.1.2 Task Delegation
-- [ ] Identify tasks for delegation
+- [x] Identify tasks for delegation
 - [x] Create task queue
-- [ ] Assign tasks to agents
+- [x] Assign tasks to agents
 - [x] Monitor task progress
-- [ ] Collect task results
+- [x] Collect task results
 
 #### 12.1.3 Specialized Agents
-- [ ] Create code-review agent
-- [ ] Create testing agent
-- [ ] Create documentation agent
-- [ ] Create refactoring agent
-- [ ] Create security-scan agent
+- [x] Create code-review agent
+- [x] Create testing agent
+- [x] Create documentation agent
+- [x] Create refactoring agent
+- [x] Create security-scan agent
+- [x] Create performance agent
+- [x] Create code-generation agent
 
 ### 12.2 Background Task Execution ✅
 
@@ -820,7 +822,7 @@
 - [x] Queue overflow handling
 
 ### 12.3 Agent Commands ✅
-- [ ] Implement /agents command
+- [x] Implement /agents command (list, show, register, unregister, pause, resume, stats)
 - [ ] Implement /background command
 - [x] Implement /tasks command (list, show, cancel)
 - [ ] Add Ctrl+B shortcut

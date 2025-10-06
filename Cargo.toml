@@ -9,6 +9,7 @@ members = [
     "crates/mcp",
     "crates/hooks",
     "crates/tasks",
+    "crates/agents",
 ]
 resolver = "2"
 
