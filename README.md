@@ -13,15 +13,89 @@ This is a complete rewrite of the Claude Code CLI from TypeScript/Node.js to Rus
 - **Better error handling** (Result types eliminate error swallowing)
 - **Cross-platform uniformity** (no platform-specific code branches)
 
-## Features
+## Current Status
 
-- Multi-provider AI integration (Claude, OpenAI, Gemini, Qwen, Ollama, LM Studio)
-- OAuth 2.0 and API key authentication
-- Secure credential storage using OS keyring
-- Interactive terminal UI with colors and spinners
-- Async/await for concurrent operations
-- Comprehensive error handling
-- Multi-account support
+**Progress: 58.1% Complete** (370/638 items)
+
+See [todo.md](todo.md) for detailed implementation tracking.
+
+### Implemented Features ✅
+
+#### Core Infrastructure
+- ✅ Multi-crate workspace architecture (9 crates)
+- ✅ Configuration management with TOML/YAML/JSON support
+- ✅ Comprehensive error handling with custom error types
+- ✅ Retry logic with exponential backoff
+- ✅ Circuit breaker patterns for resilience
+
+#### Authentication System
+- ✅ OAuth 2.0 with PKCE flow
+- ✅ Multi-provider support (Claude, OpenAI, Google, Alibaba)
+- ✅ Secure credential storage using OS keyring
+- ✅ Account switching and management
+- ✅ Token refresh and validation
+- ✅ Interactive authentication wizard
+
+#### AI Provider Integration
+- ✅ Provider abstraction layer
+- ✅ Support for 6 providers:
+  - Anthropic Claude (claude-3-5-sonnet, claude-3-opus, etc.)
+  - OpenAI (GPT-4, GPT-3.5)
+  - Google Gemini
+  - Alibaba Qwen
+  - Ollama (local models)
+  - LM Studio (local models)
+- ✅ Rate limiting and circuit breaker
+- ✅ Request/response handling
+- ✅ Model selection and task classification
+- ✅ Streaming support
+
+#### CLI Commands
+- ✅ `auth` - Authentication management (login, logout, status, switch)
+- ✅ `ask` - Single-shot AI queries
+- ✅ `explain` - Code explanation
+- ✅ `chat` - Interactive chat mode
+- ✅ `sessions` - Session management (list, show, resume, delete)
+- ✅ `providers` - List and switch AI providers
+- ✅ `config` - Configuration management (show, set, reset)
+- ✅ `codebase` - Codebase operations (scan, index, analyze)
+- ✅ `file` - File operations (read, write, edit, search)
+- ✅ `bash` - Shell command execution with timeout
+- ✅ `git` - Full git workflow (status, log, diff, branch, commit, push, pull)
+- ✅ `mcp` - Model Context Protocol operations
+- ✅ `hooks` - Lifecycle hooks management
+- ✅ `tasks` - Background task execution
+
+#### Model Context Protocol (MCP)
+- ✅ MCP client with JSON-RPC 2.0 protocol
+- ✅ Server process management
+- ✅ Resource/tool/prompt support
+- ✅ Async I/O with stdin/stdout communication
+- ✅ Connection lifecycle management
+- ✅ 7 CLI commands (list, status, connect, disconnect, resources, tools, prompts)
+
+#### Hooks System
+- ✅ 11 lifecycle hook points (pre-commit, post-commit, user-prompt-submit, etc.)
+- ✅ 3 hook types (Shell, JavaScript, Python)
+- ✅ Priority-based execution
+- ✅ Blocking/non-blocking hooks
+- ✅ Timeout support
+- ✅ 5 CLI commands (list, show, enable, disable, test)
+
+#### Background Tasks
+- ✅ Priority-based task queue (Low, Normal, High, Critical)
+- ✅ Concurrent task execution with configurable limits
+- ✅ TaskHandler trait for extensibility
+- ✅ Task lifecycle management (Queued, Running, Completed, Failed, Cancelled)
+- ✅ Progress tracking and monitoring
+- ✅ 3 CLI commands (list, show, cancel)
+
+#### Terminal UI
+- ✅ Colored output using crossterm
+- ✅ Interactive prompts with dialoguer
+- ✅ Progress spinners with indicatif
+- ✅ Formatted tables with comfy-table
+- ✅ Cross-platform terminal support
 
 ## Architecture
 
@@ -29,19 +103,27 @@ The project is organized as a Cargo workspace with the following crates:
 
 ```
 claude-code-rust/
+├── Cargo.toml          # Workspace configuration
 ├── crates/
-│   ├── cli/        # Binary crate - main entry point
-│   ├── core/       # Core types, errors, and configuration
-│   ├── auth/       # Authentication and OAuth flows
-│   ├── ai/         # AI provider integrations
-│   ├── terminal/   # Terminal UI and formatting
-│   └── utils/      # Shared utilities
+│   ├── cli/            # Binary crate - main entry point, command handlers
+│   ├── core/           # Core types, errors, configuration, file operations
+│   ├── auth/           # Authentication, OAuth flows, credential storage
+│   ├── ai/             # AI provider integrations and abstractions
+│   ├── terminal/       # Terminal UI, formatting, prompts, spinners
+│   ├── utils/          # Shared utilities (logging, fs, networking)
+│   ├── mcp/            # Model Context Protocol client
+│   ├── hooks/          # Lifecycle hooks system
+│   └── tasks/          # Background task execution
+└── todo.md             # Ultra-granular implementation tracking
 ```
 
 ### Crate Dependencies
 
 ```
-cli → core, terminal, auth, ai, utils
+cli → core, terminal, auth, ai, utils, mcp, hooks, tasks
+mcp → core, utils
+hooks → core, utils
+tasks → core, utils
 terminal → core, utils
 auth → core, utils
 ai → core, auth, utils
@@ -78,6 +160,90 @@ cargo test -- --nocapture
 
 # Build documentation
 cargo doc --open
+```
+
+## Installation
+
+```bash
+# Install from source
+cargo install --path crates/cli
+
+# Or build and copy binary
+cargo build --release
+cp target/release/claude-code ~/.local/bin/
+```
+
+## Usage
+
+```bash
+# Interactive mode
+claude-code
+
+# Single-shot query
+claude-code ask "How do I implement a binary tree in Rust?"
+
+# Explain code
+claude-code explain src/main.rs
+
+# Interactive chat
+claude-code chat
+
+# List sessions
+claude-code sessions list
+
+# Authentication
+claude-code auth login
+claude-code auth status
+claude-code auth switch
+
+# Git operations
+claude-code git status
+claude-code git commit -m "feat: add new feature"
+claude-code git push
+
+# MCP operations
+claude-code mcp list
+claude-code mcp connect <server-name>
+claude-code mcp resources <server-name>
+
+# Hooks
+claude-code hooks list
+claude-code hooks enable <hook-name>
+claude-code hooks test <hook-name>
+
+# Background tasks
+claude-code tasks list
+claude-code tasks show <task-id>
+```
+
+## Configuration
+
+Configuration files are stored in:
+- **Linux/macOS**: `~/.config/claude-code/`
+- **Windows**: `%APPDATA%\claude-code\`
+
+### Configuration Files
+
+- `config.toml` - Main configuration
+- `mcp.json` - MCP server configurations
+- `hooks.yaml` - Lifecycle hooks configuration
+- `sessions/` - Session history
+
+### Example Configuration
+
+```toml
+# config.toml
+[ai]
+default_provider = "claude"
+default_model = "claude-3-5-sonnet-20241022"
+
+[terminal]
+color_enabled = true
+unicode_enabled = true
+
+[limits]
+max_tokens = 8192
+timeout_seconds = 30
 ```
 
 ## Development
@@ -208,7 +374,10 @@ cargo build --release --target x86_64-pc-windows-msvc
 
 ### Runtime Issues
 
-1. **Keyring errors**: Ensure your system has a keyring service (Windows: Credential Manager, Linux: gnome-keyring, macOS: Keychain)
+1. **Keyring errors**: Ensure your system has a keyring service
+   - Windows: Credential Manager (built-in)
+   - Linux: gnome-keyring or KDE Wallet
+   - macOS: Keychain (built-in)
 2. **Network errors**: Check firewall and proxy settings
 3. **Permission errors**: Ensure proper file permissions for config directories
 
@@ -220,26 +389,52 @@ Key differences from the TypeScript version:
 2. **Async/Await**: Uses Tokio runtime instead of Node.js event loop
 3. **Type System**: Stronger type safety with Rust's ownership system
 4. **Dependencies**: Native Rust crates instead of npm packages
+5. **Performance**: Significantly faster startup and lower memory usage
+6. **Binary Distribution**: Single executable vs. npm package
+
+## Roadmap
+
+See [todo.md](todo.md) for detailed progress tracking.
+
+### Next Milestones
+
+- [ ] Codebase Analysis (Section 13) - 0% complete
+- [ ] Session Management (Section 4) - Partial
+- [ ] Conversation History (Section 5) - Partial
+- [ ] Testing & Quality Assurance (Section 16)
+- [ ] Documentation (Section 17)
+
+### Future Features
+
+- [ ] Subagent infrastructure
+- [ ] Built-in hooks (pre-commit, linting, etc.)
+- [ ] Task notifications
+- [ ] Plugin system
+- [ ] Web UI dashboard
+- [ ] Docker support
+- [ ] Package manager integration (cargo, npm, apt, etc.)
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests and linting
+4. Run tests and linting (`cargo test && cargo clippy`)
 5. Submit a pull request
 
 ## License
 
 MIT
 
-## Related Projects
+## Acknowledgments
 
-- [Claude Code (TypeScript)](../claude-code/) - Original TypeScript implementation
-- [Anthropic Claude API](https://www.anthropic.com/api) - Claude AI API
+- Original Claude Code CLI by Anthropic
+- Rust community for excellent crates and tools
+- Contributors and testers
 
-## Status
+## Links
 
-This is currently in active development. See the [RUST-REFACTORING-PLAN.md](../RUST-REFACTORING-PLAN.md) for the complete implementation roadmap.
-
-Current phase: **Phase 1 - Project Setup** ✅
+- [Repository](https://github.com/southernpitbull/Claude-rust)
+- [Issue Tracker](https://github.com/southernpitbull/Claude-rust/issues)
+- [Anthropic Claude API](https://www.anthropic.com/api)
+- [Rust Language](https://www.rust-lang.org/)
