@@ -6,6 +6,7 @@ pub mod config;
 pub mod error;
 pub mod execution;
 pub mod fileops;
+pub mod git_conventional;
 pub mod retry;
 pub mod session;
 pub mod types;
@@ -35,3 +36,6 @@ pub use session::{Session, SessionConfig, SessionMetadata, SessionStore};
 
 // Re-export checkpoint types
 pub use checkpoint::{Checkpoint, CheckpointInfo, CheckpointStore, RestoredCheckpoint};
+
+// Re-export git conventional commits types
+pub use git_conventional::{CommitType, ConventionalCommit, validate_commit_message};

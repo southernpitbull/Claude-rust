@@ -1,0 +1,19 @@
+[package]
+name = "claude-code-tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+
+# Local dependencies
+claude-code-core = { path = "../core" }
+
+# Additional dependencies
+regex = "1.10"
