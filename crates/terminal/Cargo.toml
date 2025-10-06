@@ -1,0 +1,30 @@
+[package]
+name = "claude-code-terminal"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# Workspace crates
+claude-code-core = { path = "../core" }
+claude-code-utils = { path = "../utils" }
+
+# Workspace dependencies
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+crossterm = { workspace = true }
+indicatif = { workspace = true }
+dialoguer = { workspace = true }
+console = { workspace = true }
+colored = { workspace = true }
+comfy-table = { workspace = true }
+tracing = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
