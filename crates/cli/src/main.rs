@@ -7,7 +7,7 @@ use std::process;
 use tracing::{error, info};
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
-use claude_code_cli::{Cli, CommandHandler};
+use claude_code_cli::{Cli, CommandHandler, is_first_run, run_first_time_setup};
 
 #[tokio::main]
 async fn main() {
@@ -16,8 +16,19 @@ async fn main() {
 
     info!("Starting Claude Code CLI v{}", env!("CARGO_PKG_VERSION"));
 
-    // Parse command line arguments
+    // Check for first run (only if no command specified)
     let cli = Cli::parse();
+
+    // Run first-time setup if this is the first run and no explicit command given
+    if cli.command.is_none() {
+        if let Ok(true) = is_first_run().await {
+            if let Err(e) = run_first_time_setup().await {
+                error!("First-time setup failed: {}", e);
+                eprintln!("\n⚠️  Setup incomplete. You can run 'claude-code auth login' to set up providers manually.");
+            }
+            return;
+        }
+    }
 
     // Handle the command
     if let Err(e) = CommandHandler::handle_command(cli).await {
