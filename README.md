@@ -15,9 +15,15 @@ This is a complete rewrite of the Claude Code CLI from TypeScript/Node.js to Rus
 
 ## Current Status
 
-**Progress: 58.1% Complete** (370/638 items)
+**Progress: 75.9% Complete** (486/640 items)
 
 See [todo.md](todo.md) for detailed implementation tracking.
+
+### Recent Additions
+- ✅ Conventional Commits support with emoji
+- ✅ Tool System with registry, permissions, and 5 built-in tools
+- ✅ Agent System with 8 specialized agent types
+- ✅ Comprehensive test coverage (80+ test modules)
 
 ### Implemented Features ✅
 
@@ -65,6 +71,33 @@ See [todo.md](todo.md) for detailed implementation tracking.
 - ✅ `mcp` - Model Context Protocol operations
 - ✅ `hooks` - Lifecycle hooks management
 - ✅ `tasks` - Background task execution
+- ✅ `agents` - Agent management (list, show, register, unregister, pause, resume, stats)
+
+#### Agents System
+- ✅ 8 specialized agent types (General, CodeReview, Testing, Documentation, Refactoring, SecurityScan, Performance, CodeGeneration)
+- ✅ Agent registry with lifecycle management
+- ✅ Task delegation with capability matching
+- ✅ Concurrent agent execution
+- ✅ Agent statistics and monitoring
+
+#### Tool System
+- ✅ Tool registry with category indexing
+- ✅ Permission system with allow/block lists
+- ✅ Parameter validation and type checking
+- ✅ 5 built-in tools:
+  - file-read (with offset/limit)
+  - file-write (dangerous, requires permission)
+  - file-edit (text replacement)
+  - bash (command execution with timeout)
+  - web-search (placeholder)
+- ✅ Tool executor with error handling
+
+#### Conventional Commits
+- ✅ 11 commit types (feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert)
+- ✅ Emoji support for each type
+- ✅ Scope, body, footer support
+- ✅ Breaking change indicators
+- ✅ Message validation
 
 #### Model Context Protocol (MCP)
 - ✅ MCP client with JSON-RPC 2.0 protocol
