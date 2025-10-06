@@ -9,7 +9,7 @@ pub mod types;
 
 pub use executor::TaskExecutor;
 pub use queue::TaskQueue;
-pub use types::{Task, TaskId, TaskStatus, TaskResult, TaskPriority};
+pub use types::{Task, TaskId, TaskStatus, TaskResult, TaskPriority, TaskNotification, TaskNotifier};
 
 use anyhow::Result;
 

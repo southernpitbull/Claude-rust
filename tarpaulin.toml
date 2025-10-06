@@ -1,0 +1,69 @@
+# Tarpaulin Code Coverage Configuration
+# Run with: cargo tarpaulin
+
+[coverage]
+# Output formats
+out = ["Html", "Lcov", "Json"]
+
+# HTML output directory
+output-dir = "target/coverage"
+
+# Target coverage thresholds
+# Exit with error if coverage is below these thresholds
+
+# Overall project coverage target: 80%
+fail-under = 80.0
+
+[report]
+# Include all crates in workspace
+workspace = true
+
+# Exclude test files from coverage
+exclude-files = [
+    "*/tests/*",
+    "*/benches/*",
+    "**/build.rs",
+    "**/examples/*"
+]
+
+# Coverage per package targets
+[package-coverage]
+# Core packages - highest coverage requirements (85%+)
+claude-code-core = { fail-under = 85.0 }
+claude-code-ai = { fail-under = 85.0 }
+claude-code-auth = { fail-under = 85.0 }
+
+# Infrastructure packages - high coverage (80%+)
+claude-code-config = { fail-under = 80.0 }
+claude-code-session = { fail-under = 80.0 }
+claude-code-mcp = { fail-under = 80.0 }
+claude-code-tasks = { fail-under = 80.0 }
+claude-code-agents = { fail-under = 80.0 }
+
+# Tool packages - moderate coverage (75%+)
+claude-code-tools = { fail-under = 75.0 }
+claude-code-hooks = { fail-under = 75.0 }
+claude-code-terminal = { fail-under = 75.0 }
+
+# CLI package - integration focused (70%+)
+claude-code-cli = { fail-under = 70.0 }
+
+[run]
+# Run all tests including doc tests
+doc = true
+
+# Timeout for tests (in seconds)
+timeout = 300
+
+# Number of test threads
+test-threads = 4
+
+[output]
+# Verbose output
+verbose = true
+
+# Show uncovered lines
+show-uncovered = true
+
+# Follow symbolic links
+follow-symbolic-links = false

@@ -3,6 +3,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::sync::Arc;
+use tokio::sync::broadcast;
 use uuid::Uuid;
 
 /// Unique task identifier
@@ -221,5 +223,178 @@ impl TaskResult {
     pub fn with_duration(mut self, duration: chrono::Duration) -> Self {
         self.duration = Some(duration);
         self
+    }
+}
+
+/// Task notification type
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskNotification {
+    /// Task was queued
+    Queued(Task),
+
+    /// Task started running
+    Started(Task),
+
+    /// Task progress updated
+    Progress {
+        task_id: TaskId,
+        progress: u8,
+        message: Option<String>,
+    },
+
+    /// Task completed successfully
+    Completed(TaskResult),
+
+    /// Task failed
+    Failed {
+        task_id: TaskId,
+        error: String,
+    },
+
+    /// Task was cancelled
+    Cancelled(TaskId),
+}
+
+impl TaskNotification {
+    /// Get task ID from notification
+    pub fn task_id(&self) -> TaskId {
+        match self {
+            Self::Queued(task) => task.id,
+            Self::Started(task) => task.id,
+            Self::Progress { task_id, .. } => *task_id,
+            Self::Completed(result) => result.task_id,
+            Self::Failed { task_id, .. } => *task_id,
+            Self::Cancelled(task_id) => *task_id,
+        }
+    }
+
+    /// Check if notification indicates task completion
+    pub fn is_terminal(&self) -> bool {
+        matches!(
+            self,
+            Self::Completed(_) | Self::Failed { .. } | Self::Cancelled(_)
+        )
+    }
+}
+
+/// Task notification channel
+#[derive(Clone)]
+pub struct TaskNotifier {
+    tx: Arc<broadcast::Sender<TaskNotification>>,
+}
+
+impl TaskNotifier {
+    /// Create a new task notifier with specified channel capacity
+    pub fn new(capacity: usize) -> Self {
+        let (tx, _) = broadcast::channel(capacity);
+        Self { tx: Arc::new(tx) }
+    }
+
+    /// Send a notification
+    pub fn notify(&self, notification: TaskNotification) {
+        // Ignore send errors (no receivers is fine)
+        let _ = self.tx.send(notification);
+    }
+
+    /// Subscribe to notifications
+    pub fn subscribe(&self) -> broadcast::Receiver<TaskNotification> {
+        self.tx.subscribe()
+    }
+
+    /// Get the number of active subscribers
+    pub fn receiver_count(&self) -> usize {
+        self.tx.receiver_count()
+    }
+}
+
+impl Default for TaskNotifier {
+    fn default() -> Self {
+        Self::new(100) // Default capacity of 100 notifications
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_task_notification_task_id() {
+        let task = Task::new("test", "test-type");
+        let task_id = task.id;
+
+        assert_eq!(TaskNotification::Queued(task.clone()).task_id(), task_id);
+        assert_eq!(TaskNotification::Started(task.clone()).task_id(), task_id);
+        assert_eq!(
+            TaskNotification::Progress {
+                task_id,
+                progress: 50,
+                message: None
+            }
+            .task_id(),
+            task_id
+        );
+    }
+
+    #[test]
+    fn test_task_notification_is_terminal() {
+        let task = Task::new("test", "test-type");
+
+        assert!(!TaskNotification::Queued(task.clone()).is_terminal());
+        assert!(!TaskNotification::Started(task).is_terminal());
+        assert!(!TaskNotification::Progress {
+            task_id: TaskId::new(),
+            progress: 50,
+            message: None
+        }
+        .is_terminal());
+
+        assert!(TaskNotification::Completed(TaskResult::success(
+            TaskId::new(),
+            None
+        ))
+        .is_terminal());
+
+        assert!(TaskNotification::Failed {
+            task_id: TaskId::new(),
+            error: "error".to_string()
+        }
+        .is_terminal());
+
+        assert!(TaskNotification::Cancelled(TaskId::new()).is_terminal());
+    }
+
+    #[tokio::test]
+    async fn test_task_notifier() {
+        let notifier = TaskNotifier::new(10);
+        let mut rx = notifier.subscribe();
+
+        // Send a notification
+        let task = Task::new("test", "test-type");
+        notifier.notify(TaskNotification::Queued(task.clone()));
+
+        // Receive the notification
+        let notification = rx.recv().await.unwrap();
+        assert_eq!(notification.task_id(), task.id);
+    }
+
+    #[tokio::test]
+    async fn test_task_notifier_multiple_receivers() {
+        let notifier = TaskNotifier::new(10);
+        let mut rx1 = notifier.subscribe();
+        let mut rx2 = notifier.subscribe();
+
+        assert_eq!(notifier.receiver_count(), 2);
+
+        // Send a notification
+        let task = Task::new("test", "test-type");
+        notifier.notify(TaskNotification::Queued(task.clone()));
+
+        // Both receivers should get the notification
+        let notif1 = rx1.recv().await.unwrap();
+        let notif2 = rx2.recv().await.unwrap();
+
+        assert_eq!(notif1.task_id(), task.id);
+        assert_eq!(notif2.task_id(), task.id);
     }
 }

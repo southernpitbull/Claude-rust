@@ -195,9 +195,39 @@ cargo test --lib
 # Integration tests only
 cargo test --test '*'
 
-# Documentation tests
+# Doc tests only
 cargo test --doc
 ```
+
+### Code Coverage
+
+We aim for high test coverage across the codebase. Coverage targets are configured in `tarpaulin.toml`:
+
+**Coverage Targets:**
+- **Overall Project**: 80%+
+- **Core Packages** (core, ai, auth): 85%+
+- **Infrastructure** (config, session, mcp, tasks, agents): 80%+
+- **Tools** (tools, hooks, terminal): 75%+
+- **CLI Package**: 70%+
+
+**Generate Coverage Report:**
+
+```bash
+# Install tarpaulin (one-time)
+cargo install cargo-tarpaulin
+
+# Generate coverage report
+cargo tarpaulin --config tarpaulin.toml --engine llvm
+
+# View HTML report
+open target/coverage/index.html  # macOS
+xdg-open target/coverage/index.html  # Linux
+start target/coverage/index.html  # Windows
+```
+
+**Coverage in CI/CD:**
+
+Coverage is automatically generated and reported on every PR. The CI will fail if coverage drops below the thresholds defined in `tarpaulin.toml`.
 
 ## Code Style
 
