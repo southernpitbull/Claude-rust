@@ -1,0 +1,22 @@
+[package]
+name = "claude-code-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# Workspace dependencies
+tokio = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+# Async channel for communication
+async-channel = "2.3"
+
+# Optional: For stdio-based MCP servers
+tokio-util = { version = "0.7", features = ["codec"] }
+futures = "0.3"
