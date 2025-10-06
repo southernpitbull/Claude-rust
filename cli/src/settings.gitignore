@@ -1,0 +1,16 @@
+# Claude Code Local Settings
+.claude/settings.local.json
+
+# Claude Code Cache and Temporary Files
+.claude/cache/
+.claude/tmp/
+.claude/logs/
+
+# Claude Code Sessions
+.claude/sessions/
+
+# Claude Code Checkpoints
+.claude/checkpoints/
+
+# Claude Code History
+.claude/history.txt
