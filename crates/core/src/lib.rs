@@ -10,6 +10,7 @@ pub mod git_conventional;
 pub mod retry;
 pub mod session;
 pub mod types;
+pub mod version;
 
 // Re-export primary error types for convenience
 pub use error::{AppError, AppResult, ErrorCategory, ErrorContext};
@@ -39,3 +40,6 @@ pub use checkpoint::{Checkpoint, CheckpointInfo, CheckpointStore, RestoredCheckp
 
 // Re-export git conventional commits types
 pub use git_conventional::{CommitType, ConventionalCommit, validate_commit_message};
+
+// Re-export version management
+pub use version::{VersionInfo, VersionCheckCache, fetch_latest_version, is_newer_version, VERSION};

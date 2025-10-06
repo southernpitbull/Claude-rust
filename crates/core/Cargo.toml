@@ -27,6 +27,7 @@ walkdir = { workspace = true }
 glob = { workspace = true }
 futures = { workspace = true }
 async-trait = { workspace = true }
+reqwest = { workspace = true }
 
 # Tree-sitter dependencies for code analysis
 tree-sitter = "0.20"

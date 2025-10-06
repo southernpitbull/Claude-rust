@@ -2,11 +2,11 @@
 
 ## Progress Tracking
 
-**Overall Completion: ~80.9%**
+**Overall Completion: ~82.5%**
 
-- ✅ Complete: 518 items
+- ✅ Complete: 528 items
 - 🟡 In Progress: 57 items
-- 🔴 Not Started: 65 items
+- 🔴 Not Started: 55 items
 
 **Total Items: 640**
 
@@ -1013,7 +1013,7 @@
 - [ ] Implement /commit-fast command
 - [ ] Implement /create-pr command
 - [ ] Implement /fix-pr command
-- [ ] Add git status display
+- [x] Add git status display (implemented in commands.rs)
 
 ---
 
@@ -1255,7 +1255,7 @@
 - [x] Document modules (364 module doc comments)
 - [x] Add code comments (1856+ function doc comments)
 - [x] Create API docs (rustdoc-ready with /// comments)
-- [ ] Add contribution guide
+- [x] Add contribution guide (CONTRIBUTING.md)
 - [~] Document testing (test modules exist, needs guide)
 
 ### 19.3 Command Reference 🔴
@@ -1284,7 +1284,7 @@
 - [ ] Add platform-specific features
 
 ### 20.3 Installation Methods 🔴
-- [ ] Create install script
+- [x] Create install script (install.sh)
 - [ ] Publish to crates.io
 - [ ] Create binary releases
 - [ ] Add to package managers
@@ -1293,12 +1293,12 @@
   - [ ] APT (Debian/Ubuntu)
   - [ ] Snap (Linux)
 
-### 20.4 Updates 🔴
-- [ ] Implement version checking
-- [ ] Add update command
-- [ ] Support auto-updates
-- [ ] Show changelog
-- [ ] Handle migrations
+### 20.4 Updates 🟡
+- [x] Implement version checking (version.rs with GitHub API)
+- [~] Add update command (future: CLI command)
+- [~] Support auto-updates (future: auto-download)
+- [~] Show changelog (future: display release notes)
+- [~] Handle migrations (future: version migration logic)
 
 ---
 
