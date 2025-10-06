@@ -42,24 +42,57 @@ pub trait OAuthProvider {
 // ============================================================================
 
 /// Anthropic Claude OAuth endpoints
+///
+/// NOTE: As of 2025, Anthropic does NOT support OAuth 2.0 authentication.
+/// The Claude API uses API key authentication only. These endpoints are
+/// placeholders for future OAuth support if/when Anthropic implements it.
+///
+/// Current authentication: Use ANTHROPIC_API_KEY environment variable or
+/// API key from https://console.anthropic.com/settings/keys
 pub mod claude_endpoints {
     pub const AUTHORIZATION_URL: &str = "https://auth.anthropic.com/oauth/authorize";
     pub const TOKEN_URL: &str = "https://auth.anthropic.com/oauth/token";
     pub const REVOKE_URL: &str = "https://auth.anthropic.com/oauth/revoke";
 
     pub const DEFAULT_SCOPES: &[&str] = &["read", "write"];
+
+    /// Indicates whether this provider supports OAuth
+    pub const OAUTH_SUPPORTED: bool = false;
 }
 
 /// OpenAI OAuth endpoints
+///
+/// NOTE: As of 2025, OpenAI does NOT support OAuth 2.0 for API access.
+/// OAuth is only available for Actions/Plugins, not for direct API calls.
+/// The OpenAI API uses API key authentication. These endpoints are
+/// placeholders for future OAuth support if/when OpenAI implements it.
+///
+/// Current authentication: Use OPENAI_API_KEY environment variable or
+/// API key from https://platform.openai.com/api-keys
 pub mod openai_endpoints {
     pub const AUTHORIZATION_URL: &str = "https://auth.openai.com/authorize";
     pub const TOKEN_URL: &str = "https://auth.openai.com/oauth/token";
     pub const REVOKE_URL: &str = "https://auth.openai.com/oauth/revoke";
 
     pub const DEFAULT_SCOPES: &[&str] = &["api.read", "api.write"];
+
+    /// Indicates whether this provider supports OAuth
+    pub const OAUTH_SUPPORTED: bool = false;
 }
 
 /// Google Gemini OAuth endpoints
+///
+/// Google Gemini DOES support OAuth 2.0 authentication as of 2025.
+/// This is the recommended authentication method for production applications.
+///
+/// Setup Instructions:
+/// 1. Enable the Google Generative Language API in Google Cloud Console
+/// 2. Configure OAuth consent screen and add test users
+/// 3. Create OAuth 2.0 Client ID (Application type: Desktop app)
+/// 4. Download credentials as client_secret.json
+/// 5. Use the client_id and client_secret from that file
+///
+/// Documentation: https://ai.google.dev/gemini-api/docs/oauth
 pub mod gemini_endpoints {
     pub const AUTHORIZATION_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
     pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
@@ -67,17 +100,29 @@ pub mod gemini_endpoints {
 
     pub const DEFAULT_SCOPES: &[&str] = &[
         "https://www.googleapis.com/auth/generative-language.retriever",
-        "https://www.googleapis.com/auth/cloud-platform",
     ];
+
+    /// Indicates whether this provider supports OAuth
+    pub const OAUTH_SUPPORTED: bool = true;
 }
 
 /// Alibaba Qwen OAuth endpoints
+///
+/// NOTE: As of 2025, Alibaba Qwen/DashScope does NOT support OAuth 2.0.
+/// The DashScope API uses API key authentication only. These endpoints are
+/// placeholders for future OAuth support if/when Alibaba implements it.
+///
+/// Current authentication: Use QWEN_API_KEY environment variable or
+/// API key from https://dashscope.console.aliyun.com/apiKey
 pub mod qwen_endpoints {
     pub const AUTHORIZATION_URL: &str = "https://oauth.aliyun.com/oauth/authorize";
     pub const TOKEN_URL: &str = "https://oauth.aliyun.com/oauth/token";
     pub const REVOKE_URL: &str = "https://oauth.aliyun.com/oauth/revoke";
 
     pub const DEFAULT_SCOPES: &[&str] = &["qwen.read", "qwen.write"];
+
+    /// Indicates whether this provider supports OAuth
+    pub const OAUTH_SUPPORTED: bool = false;
 }
 
 // ============================================================================

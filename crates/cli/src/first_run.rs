@@ -4,6 +4,9 @@
 
 use anyhow::Result;
 use claude_rust_auth::{AuthManager, CredentialStore};
+use claude_rust_auth::oauth::{
+    GeminiOAuth, claude_endpoints, openai_endpoints, gemini_endpoints, qwen_endpoints, OAuthProvider,
+};
 use claude_rust_core::types::ProviderType;
 use claude_rust_core::config::ConfigLoader;
 use std::io::{self, Write};
@@ -247,15 +250,119 @@ async fn setup_api_key(provider: ProviderType) -> Result<()> {
 /// Set up provider using OAuth
 async fn setup_oauth(provider: ProviderType) -> Result<()> {
     println!("\n   Starting OAuth flow for {}...", provider);
-    println!("   A browser window will open for authentication.");
-    println!("   Follow the prompts to authorize Claude-Rust.");
 
-    // TODO: Implement OAuth flow
-    // For now, this is a placeholder
-    warn!("OAuth not yet implemented for {}", provider);
-    println!("   ⚠️  OAuth not yet available. Please use API key instead.");
+    // Check if provider supports OAuth
+    let oauth_supported = match provider {
+        ProviderType::Claude => claude_endpoints::OAUTH_SUPPORTED,
+        ProviderType::OpenAI => openai_endpoints::OAUTH_SUPPORTED,
+        ProviderType::Gemini => gemini_endpoints::OAUTH_SUPPORTED,
+        ProviderType::Qwen => qwen_endpoints::OAUTH_SUPPORTED,
+        ProviderType::Ollama | ProviderType::LMStudio => false, // Local providers don't use OAuth
+    };
 
-    setup_api_key(provider).await
+    if !oauth_supported {
+        warn!("{} does not support OAuth authentication", provider);
+        println!("   ⚠️  {} does not support OAuth.", provider);
+        println!("   OAuth is only available for: Google Gemini");
+        println!("   Other providers use API key authentication.");
+        println!();
+        return setup_api_key(provider).await;
+    }
+
+    // Gemini OAuth implementation
+    match provider {
+        ProviderType::Gemini => {
+            println!("   🔐 Google Gemini supports OAuth 2.0 authentication.");
+            println!();
+            println!("   Before proceeding, you need OAuth credentials:");
+            println!("   1. Go to Google Cloud Console: https://console.cloud.google.com");
+            println!("   2. Create a new project or select existing project");
+            println!("   3. Enable 'Google Generative Language API'");
+            println!("   4. Configure OAuth consent screen (add yourself as test user)");
+            println!("   5. Create OAuth 2.0 Client ID (type: Desktop app)");
+            println!("   6. Download the credentials JSON file");
+            println!();
+            println!("   You'll need the Client ID and Client Secret from that file.");
+            println!();
+
+            // Prompt for OAuth credentials
+            print!("   Enter your Google OAuth Client ID: ");
+            io::stdout().flush()?;
+            let mut client_id = String::new();
+            io::stdin().read_line(&mut client_id)?;
+            let client_id = client_id.trim();
+
+            if client_id.is_empty() {
+                println!("   ⚠️  Client ID cannot be empty. Falling back to API key.");
+                return setup_api_key(provider).await;
+            }
+
+            print!("   Enter your Google OAuth Client Secret: ");
+            io::stdout().flush()?;
+            let mut client_secret = String::new();
+            io::stdin().read_line(&mut client_secret)?;
+            let client_secret = client_secret.trim();
+
+            if client_secret.is_empty() {
+                println!("   ⚠️  Client Secret cannot be empty. Falling back to API key.");
+                return setup_api_key(provider).await;
+            }
+
+            println!();
+            println!("   Starting OAuth flow...");
+            println!("   A browser window will open for you to authorize the application.");
+            println!("   After authorizing, you'll be redirected back.");
+            println!();
+
+            // Create OAuth flow
+            let mut oauth = GeminiOAuth::new(client_id.to_string())
+                .with_client_secret(client_secret.to_string())
+                .with_redirect_uri("http://localhost:8080/callback".to_string());
+
+            // Run OAuth flow
+            match oauth.authenticate().await {
+                Ok(token_response) => {
+                    info!("Successfully obtained OAuth tokens for Gemini");
+
+                    // Store the tokens
+                    let store = CredentialStore::new();
+                    let manager = AuthManager::new(store)?;
+
+                    // Store access token
+                    manager.store_api_key("gemini", &token_response.access_token).await?;
+
+                    // Store refresh token if available
+                    if let Some(refresh_token) = &token_response.refresh_token {
+                        // Save refresh token to a separate storage for future token refresh
+                        manager.store_api_key("gemini_refresh", refresh_token).await?;
+                    }
+
+                    println!("   ✅ {} configured successfully via OAuth!", provider);
+                    Ok(())
+                }
+                Err(e) => {
+                    warn!("OAuth flow failed for Gemini: {}", e);
+                    println!("   ❌ OAuth flow failed: {}", e);
+                    println!("   Would you like to try using an API key instead? [y/n]: ");
+                    io::stdout().flush()?;
+
+                    let mut fallback = String::new();
+                    io::stdin().read_line(&mut fallback)?;
+
+                    if matches!(fallback.trim().to_lowercase().as_str(), "y" | "yes") {
+                        setup_api_key(provider).await
+                    } else {
+                        Err(anyhow::anyhow!("OAuth setup failed"))
+                    }
+                }
+            }
+        }
+        _ => {
+            // This should never be reached due to the oauth_supported check above
+            warn!("OAuth attempted for unsupported provider: {}", provider);
+            setup_api_key(provider).await
+        }
+    }
 }
 
 /// Get the URL where users can obtain API keys
