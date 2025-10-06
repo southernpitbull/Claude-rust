@@ -1,0 +1,22 @@
+[package]
+name = "claude-code-hooks"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# Workspace dependencies
+tokio = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tracing = { workspace = true }
+
+# Async traits
+async-trait = { workspace = true }
+
+# For script execution
+regex = { workspace = true }
