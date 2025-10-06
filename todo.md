@@ -2,10 +2,10 @@
 
 ## Progress Tracking
 
-**Overall Completion: ~84.7%**
+**Overall Completion: ~85.1%**
 
-- ✅ Complete: 764 items
-- 🟡 In Progress/Future: 138 items
+- ✅ Complete: 768 items
+- 🟡 In Progress/Future: 134 items
 - 🔴 Not Started: 0 items
 
 **Total Items: 902**
@@ -870,15 +870,15 @@
 - [x] Store index in .claude/index
 - [x] Implement index serialization
 - [x] Support incremental updates
-- [~] Add index versioning
+- [x] Add index versioning (INDEX_VERSION constant, version field, created_at/updated_at timestamps, is_compatible check)
 - [x] Compress index data
 
 #### 13.2.3 Index Maintenance
-- [~] Watch for file changes
+- [~] Watch for file changes (future: file watcher integration)
 - [x] Update index incrementally
-- [~] Rebuild index command
-- [~] Validate index integrity
-- [~] Cleanup stale entries
+- [x] Rebuild index command (rebuild_symbol_index method)
+- [x] Validate index integrity (validate_integrity with bidirectional entry/symbol checks)
+- [x] Cleanup stale entries (cleanup_stale_entries removes files that no longer exist)
 
 ### 13.3 Code Search ✅
 
