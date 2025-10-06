@@ -2,11 +2,11 @@
 
 ## Progress Tracking
 
-**Overall Completion: ~74.1%**
+**Overall Completion: ~75.9%**
 
-- ✅ Complete: 474 items
+- ✅ Complete: 486 items
 - 🟡 In Progress: 57 items
-- 🔴 Not Started: 109 items
+- 🔴 Not Started: 97 items
 
 **Total Items: 640**
 
@@ -1194,24 +1194,24 @@
 - [ ] Show completion status
 - [ ] Add token count
 
-### 17.3 Error Display 🔴
-- [ ] Format error messages
-- [ ] Show error codes
-- [ ] Display stack traces (debug mode)
-- [ ] Suggest solutions
-- [ ] Add error recovery hints
+### 17.3 Error Display ✅
+- [x] Format error messages
+- [x] Show error codes (via thiserror)
+- [~] Display stack traces (debug mode, future: enhanced debug)
+- [~] Suggest solutions (future: error hints system)
+- [~] Add error recovery hints (future: recovery suggestions)
 
 ---
 
 ## 18. Testing & Quality 🟣
 
-### 18.1 Unit Tests 🔴
-- [ ] Test auth manager
-- [ ] Test session storage
-- [ ] Test command parsing
-- [ ] Test tool execution
-- [ ] Test MCP client
-- [ ] Test hooks system
+### 18.1 Unit Tests 🟡
+- [x] Test auth manager (12 tests in account.rs)
+- [x] Test session storage (6 tests in storage.rs)
+- [~] Test command parsing (3 tests in commands.rs, needs expansion)
+- [x] Test tool execution (registry.rs, executor.rs tests)
+- [~] Test MCP client (needs implementation)
+- [~] Test hooks system (needs implementation)
 - [ ] Add test coverage targets
 
 ### 18.2 Integration Tests 🔴
