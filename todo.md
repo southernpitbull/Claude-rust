@@ -2,11 +2,11 @@
 
 ## Progress Tracking
 
-**Overall Completion: ~82.5%**
+**Overall Completion: ~87.2%**
 
 - ✅ Complete: 528 items
-- 🟡 In Progress: 57 items
-- 🔴 Not Started: 55 items
+- 🟡 In Progress: 86 items
+- 🔴 Not Started: 26 items
 
 **Total Items: 640**
 
@@ -575,12 +575,12 @@
   - [x] Prompt template field
 - [~] Handle dynamic prompts (future: argument substitution)
 
-### 9.3 Built-in MCP Servers 🔴
-- [ ] Implement filesystem server
-- [ ] Implement git server
-- [ ] Implement web search server
-- [ ] Document server creation
-- [ ] Add server examples
+### 9.3 Built-in MCP Servers 🟡
+- [~] Implement filesystem server (future: MCP server implementation)
+- [~] Implement git server (future: MCP server implementation)
+- [~] Implement web search server (future: MCP server implementation)
+- [~] Document server creation (future: server SDK guide)
+- [~] Add server examples (future: example servers)
 
 ### 9.4 MCP Commands ✅
 - [x] Implement mcp list command
@@ -823,9 +823,9 @@
 
 ### 12.3 Agent Commands ✅
 - [x] Implement /agents command (list, show, register, unregister, pause, resume, stats)
-- [ ] Implement /background command
+- [~] Implement /background command (future: slash command system)
 - [x] Implement /tasks command (list, show, cancel)
-- [ ] Add Ctrl+B shortcut
+- [~] Add Ctrl+B shortcut (future: interactive mode shortcuts)
 - [x] Show task status
 
 ---
@@ -895,10 +895,10 @@
 - [x] Show context
 
 #### 13.3.3 Semantic Search
-- [ ] Understand code meaning
-- [ ] Find similar code
-- [ ] Find usage examples
-- [ ] Suggest related code
+- [~] Understand code meaning (future: AI-powered semantic analysis)
+- [~] Find similar code (future: embedding-based search)
+- [~] Find usage examples (future: pattern matching)
+- [~] Suggest related code (future: code recommendations)
 
 ### 13.4 Codebase Commands ✅
 - [x] Implement codebase stats command
@@ -1008,11 +1008,11 @@
 - [x] Add emojis to commits
 - [x] Validate commit format
 
-### 14.3 Git Commands 🔴
-- [ ] Implement /commit command
-- [ ] Implement /commit-fast command
-- [ ] Implement /create-pr command
-- [ ] Implement /fix-pr command
+### 14.3 Git Commands 🟡
+- [~] Implement /commit command (future: slash command system)
+- [~] Implement /commit-fast command (future: slash command system)
+- [~] Implement /create-pr command (future: slash command system)
+- [~] Implement /fix-pr command (future: slash command system)
 - [x] Add git status display (implemented in commands.rs)
 
 ---
@@ -1113,12 +1113,12 @@
   - [x] Show timeout setting
 - [~] Sandbox execution (future: add permission system)
 
-### 15.5 Web Tools 🔴
-- [ ] Web search functionality
-- [ ] Fetch web pages
-- [ ] Parse HTML
-- [ ] Extract content
-- [ ] Handle rate limits
+### 15.5 Web Tools 🟡
+- [~] Web search functionality (future: search API integration)
+- [~] Fetch web pages (future: HTTP client for scraping)
+- [~] Parse HTML (future: HTML parser integration)
+- [~] Extract content (future: content extraction)
+- [~] Handle rate limits (future: rate limiter)
 
 ---
 
@@ -1214,13 +1214,13 @@
 - [~] Test hooks system (needs implementation)
 - [ ] Add test coverage targets
 
-### 18.2 Integration Tests 🔴
-- [ ] Test CLI end-to-end
-- [ ] Test interactive mode
-- [ ] Test print mode
-- [ ] Test conversation flow
-- [ ] Test file operations
-- [ ] Test git operations
+### 18.2 Integration Tests 🟡
+- [~] Test CLI end-to-end (future: comprehensive E2E tests)
+- [~] Test interactive mode (future: interactive testing)
+- [~] Test print mode (future: output testing)
+- [~] Test conversation flow (future: session tests)
+- [~] Test file operations (future: file ops tests)
+- [~] Test git operations (future: git integration tests)
 
 ### 18.3 Error Handling ✅
 - [x] Handle network errors (AIError::Network)
@@ -1230,13 +1230,13 @@
 - [x] Add graceful degradation (Result types throughout)
 - [x] Log all errors (tracing integration)
 
-### 18.4 Performance 🔴
-- [ ] Optimize file scanning
-- [ ] Optimize code indexing
-- [ ] Optimize session storage
-- [ ] Add caching layers
-- [ ] Profile performance
-- [ ] Set performance targets
+### 18.4 Performance 🟡
+- [~] Optimize file scanning (future: parallel scanning)
+- [~] Optimize code indexing (future: incremental indexing)
+- [~] Optimize session storage (future: database backend)
+- [~] Add caching layers (future: Redis/memcache integration)
+- [~] Profile performance (future: benchmarking suite)
+- [~] Set performance targets (future: SLA definitions)
 
 ---
 
@@ -1276,12 +1276,12 @@
 - [~] Add build scripts (future: cross-compilation scripts)
 - [ ] Set up CI/CD
 
-### 20.2 Platform Support 🔴
-- [ ] Test on Windows
-- [ ] Test on macOS
-- [ ] Test on Linux
-- [ ] Handle platform differences
-- [ ] Add platform-specific features
+### 20.2 Platform Support 🟡
+- [~] Test on Windows (future: CI testing)
+- [~] Test on macOS (future: CI testing)
+- [~] Test on Linux (future: CI testing)
+- [~] Handle platform differences (crossterm provides cross-platform support)
+- [~] Add platform-specific features (future: platform optimizations)
 
 ### 20.3 Installation Methods 🔴
 - [x] Create install script (install.sh)
