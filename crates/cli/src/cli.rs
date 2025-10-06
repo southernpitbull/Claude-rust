@@ -3,31 +3,31 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-/// Claude Code CLI - AI-powered coding assistant
+/// Claude-Rust CLI - AI-powered coding assistant
 ///
-/// A Rust implementation of the Claude Code CLI tool providing AI-powered
+/// A Rust implementation of the Claude-Rust CLI tool providing AI-powered
 /// code generation, analysis, and interactive assistance.
 #[derive(Parser, Debug)]
 #[command(
-    name = "claude-code",
+    name = "claude-rust",
     version,
-    about = "Claude Code CLI - AI-powered coding assistant",
+    about = "Claude-Rust CLI - AI-powered coding assistant",
     long_about = "A powerful CLI tool for AI-assisted software development.\n\
                   Provides code generation, analysis, refactoring, and interactive assistance\n\
                   powered by multiple AI providers including Claude, OpenAI, Gemini, and more.",
     author,
     after_help = "EXAMPLES:\n  \
                   # Start interactive session\n  \
-                  claude-code interactive\n\n  \
+                  claude-rust interactive\n\n  \
                   # Query AI with a question\n  \
-                  claude-code query \"How do I implement a binary search tree in Rust?\"\n\n  \
+                  claude-rust query \"How do I implement a binary search tree in Rust?\"\n\n  \
                   # Analyze current codebase\n  \
-                  claude-code analyze --path ./src\n\n  \
+                  claude-rust analyze --path ./src\n\n  \
                   # Login with OAuth\n  \
-                  claude-code auth login --provider claude\n\n  \
+                  claude-rust auth login --provider claude\n\n  \
                   # Initialize new project\n  \
-                  claude-code init --name my-project --template rust-cli\n\n\
-                  For more information, visit: https://github.com/anthropic/claude-code"
+                  claude-rust init --name my-project --template rust-cli\n\n\
+                  For more information, visit: https://github.com/anthropic/claude-rust"
 )]
 pub struct Cli {
     /// Subcommand to execute
@@ -62,7 +62,7 @@ pub enum Commands {
     #[command(
         name = "init",
         about = "Initialize a new project",
-        long_about = "Initialize a new project with Claude Code support or configure\n\
+        long_about = "Initialize a new project with Claude-Rust support or configure\n\
                       an existing project with templates and configurations."
     )]
     Init {
@@ -247,7 +247,7 @@ pub enum Commands {
     #[command(
         name = "status",
         about = "Check system status",
-        long_about = "Check the status of Claude Code installation, configuration,\n\
+        long_about = "Check the status of Claude-Rust installation, configuration,\n\
                       and connected services."
     )]
     Status {

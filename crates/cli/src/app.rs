@@ -1,10 +1,10 @@
 //! Application context and lifecycle management.
 
 use anyhow::{Context, Result};
-use claude_code_ai::{AIClient, ProviderConfig};
-use claude_code_auth::{AuthManager, CredentialStore};
-use claude_code_core::config::Config;
-use claude_code_terminal::{Formatter, TerminalConfig};
+use claude_rust_ai::{AIClient, ProviderConfig};
+use claude_rust_auth::{AuthManager, CredentialStore};
+use claude_rust_core::config::Config;
+use claude_rust_terminal::{Formatter, TerminalConfig};
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -43,7 +43,7 @@ impl App {
     /// Initializes all components including configuration loading,
     /// authentication setup, and terminal formatting.
     pub async fn new(cli_args: Cli) -> Result<Self> {
-        info!("Initializing Claude Code CLI application");
+        info!("Initializing Claude-Rust CLI application");
 
         // Determine workspace directory
         let workspace = if let Some(ref ws) = cli_args.workspace {
@@ -85,18 +85,18 @@ impl App {
             Some(path.clone())
         } else {
             // Try to find config in workspace or home directory
-            let workspace_config = workspace.join(".claude-code.toml");
+            let workspace_config = workspace.join(".claude-rust.toml");
             if workspace_config.exists() {
                 Some(workspace_config)
             } else {
-                dirs::config_dir().map(|d| d.join("claude-code").join("config.toml"))
+                dirs::config_dir().map(|d| d.join("claude-rust").join("config.toml"))
             }
         };
 
         let mut config = if let Some(path) = config_path {
             if path.exists() {
                 // Load config from file using ConfigLoader
-                let loader = claude_code_core::config::ConfigLoader::new();
+                let loader = claude_rust_core::config::ConfigLoader::new();
                 loader.load_from_file(&path)
                     .context(format!("Failed to load config from {}", path.display()))?
             } else {
@@ -109,9 +109,9 @@ impl App {
 
         // Override with CLI flags
         if cli_args.verbose {
-            config.log_level = claude_code_core::types::LogLevel::Debug;
+            config.log_level = claude_rust_core::types::LogLevel::Debug;
         } else if cli_args.quiet {
-            config.log_level = claude_code_core::types::LogLevel::Error;
+            config.log_level = claude_rust_core::types::LogLevel::Error;
         }
 
         Ok(config)
@@ -163,7 +163,7 @@ impl App {
             let auth_token = self.auth_manager
                 .get_token(&provider.to_string())
                 .await
-                .context("No authentication token found. Please run 'claude-code auth login' first.")?;
+                .context("No authentication token found. Please run 'claude-rust auth login' first.")?;
 
             // Create provider configuration
             let provider_config = ProviderConfig::new(
@@ -281,7 +281,7 @@ impl App {
         let formatter = &self.formatter;
 
         formatter.print_success(&format!(
-            "Claude Code CLI v{}",
+            "Claude-Rust CLI v{}",
             env!("CARGO_PKG_VERSION")
         ));
 
@@ -294,7 +294,7 @@ impl App {
     async fn print_status(&self, detailed: bool) -> Result<()> {
         let formatter = &self.formatter;
 
-        formatter.print_header("Claude Code Status");
+        formatter.print_header("Claude-Rust Status");
         println!();
 
         // Check authentication status
@@ -312,7 +312,7 @@ impl App {
 
         println!();
         println!("Workspace: {}", self.workspace.display());
-        println!("Config: ~/.config/claude-code/config.toml"); // Using a placeholder since we don't have a method to get the config path
+        println!("Config: ~/.config/claude-rust/config.toml"); // Using a placeholder since we don't have a method to get the config path
 
         if detailed {
             println!();
@@ -330,21 +330,21 @@ impl App {
         let formatter = &self.formatter;
 
         formatter.print_header(&format!(
-            "Claude Code CLI v{}",
+            "Claude-Rust CLI v{}",
             env!("CARGO_PKG_VERSION")
         ));
 
         println!();
         println!("AI-powered coding assistant for Rust and beyond.");
         println!();
-        println!("Run 'claude-code --help' for usage information.");
-        println!("Run 'claude-code interactive' to start an interactive session.");
-        println!("Run 'claude-code auth login' to authenticate with an AI provider.");
+        println!("Run 'claude-rust --help' for usage information.");
+        println!("Run 'claude-rust interactive' to start an interactive session.");
+        println!("Run 'claude-rust auth login' to authenticate with an AI provider.");
     }
 
     /// Perform cleanup on application shutdown.
     pub async fn shutdown(&self) -> Result<()> {
-        info!("Shutting down Claude Code CLI");
+        info!("Shutting down Claude-Rust CLI");
 
         // Close AI client if initialized
         let mut client_lock = self.ai_client.write().await;

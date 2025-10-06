@@ -21,4 +21,4 @@ pub use types::{
 };
 
 // Re-export ProviderType from core
-pub use claude_code_core::types::ProviderType;
+pub use claude_rust_core::types::ProviderType;

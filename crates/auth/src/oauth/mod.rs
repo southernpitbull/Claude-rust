@@ -21,7 +21,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use claude_code_auth::oauth::providers::ClaudeOAuth;
+//! use claude_rust_auth::oauth::providers::ClaudeOAuth;
 //!
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // Initialize OAuth flow for Claude

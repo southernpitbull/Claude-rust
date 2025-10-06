@@ -5,7 +5,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 
 /// Message roles for conversation
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

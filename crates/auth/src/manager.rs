@@ -4,7 +4,7 @@ use crate::oauth_manager::OAuthManager;
 use crate::storage::CredentialStore;
 use crate::tokens::AuthToken;
 use chrono::Utc;
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 use std::sync::Arc;
 use tracing::{debug, info, warn};
 
@@ -167,7 +167,7 @@ impl AuthManager {
     /// Authenticate using OAuth flow
     pub async fn authenticate_oauth(&self, provider: &str) -> AuthResult<TokenResponse> {
         let provider_type = Self::parse_provider_str(provider);
-        let client_id = "claude-code-cli"; // Default client ID
+        let client_id = "claude-rust-cli"; // Default client ID
         self.start_oauth_flow(provider_type, client_id).await
     }
 

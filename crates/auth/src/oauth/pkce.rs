@@ -65,7 +65,7 @@ impl PkceParams {
     /// # Examples
     ///
     /// ```
-    /// use claude_code_auth::pkce::PkceParams;
+    /// use claude_rust_auth::pkce::PkceParams;
     ///
     /// let params = PkceParams::new(64);
     /// assert_eq!(params.code_verifier.len(), 64);
@@ -141,7 +141,7 @@ impl PkceParams {
 /// # Examples
 ///
 /// ```
-/// use claude_code_auth::pkce::generate_code_verifier;
+/// use claude_rust_auth::pkce::generate_code_verifier;
 ///
 /// let verifier = generate_code_verifier(64);
 /// assert_eq!(verifier.len(), 64);
@@ -169,7 +169,7 @@ pub fn generate_code_verifier(length: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// use claude_code_auth::pkce::{generate_code_challenge, ChallengeMethod};
+/// use claude_rust_auth::pkce::{generate_code_challenge, ChallengeMethod};
 ///
 /// let verifier = "test_verifier_12345";
 /// let challenge = generate_code_challenge(verifier, ChallengeMethod::S256);
@@ -205,7 +205,7 @@ pub fn generate_code_challenge(verifier: &str, method: ChallengeMethod) -> Strin
 /// # Examples
 ///
 /// ```
-/// use claude_code_auth::pkce::{generate_code_verifier, generate_code_challenge, verify_challenge, ChallengeMethod};
+/// use claude_rust_auth::pkce::{generate_code_verifier, generate_code_challenge, verify_challenge, ChallengeMethod};
 ///
 /// let verifier = generate_code_verifier(64);
 /// let challenge = generate_code_challenge(&verifier, ChallengeMethod::S256);

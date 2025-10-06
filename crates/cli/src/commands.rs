@@ -952,8 +952,8 @@ impl CommandHandler {
 
     /// Handle print mode query execution
     async fn handle_print_query(query: &str, cli: &Cli) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::{AiClient, CompletionRequest, Message, MessageRole};
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::{AiClient, CompletionRequest, Message, MessageRole};
         use std::collections::HashMap;
         
         // Determine provider and model
@@ -963,7 +963,7 @@ impl CommandHandler {
         // Check authentication
         let auth_manager = AuthManager::with_defaults();
         if !auth_manager.has_credentials(provider_str).await {
-            eprintln!("❌ Authentication required for {}. Use 'claude-code auth login {}' first.", provider_str, provider_str);
+            eprintln!("❌ Authentication required for {}. Use 'claude-rust auth login {}' first.", provider_str, provider_str);
             std::process::exit(1);
         }
         
@@ -1014,7 +1014,7 @@ impl CommandHandler {
             Err(e) => {
                 eprintln!("❌ API Error: {}", e);
                 if e.to_string().contains("authentication") {
-                    eprintln!("💡 Try logging in again with: claude-code auth login {}", provider_str);
+                    eprintln!("💡 Try logging in again with: claude-rust auth login {}", provider_str);
                 }
                 std::process::exit(1);
             }
@@ -1023,9 +1023,9 @@ impl CommandHandler {
 
     /// Handle continue conversation mode (-c flag)
     async fn handle_continue_conversation(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_core::session::SessionStore;
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::AiClient;
+        use claude_rust_core::session::SessionStore;
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::AiClient;
         use crate::interactive::InteractiveSession;
         use std::sync::Arc;
 
@@ -1078,9 +1078,9 @@ impl CommandHandler {
 
     /// Handle resume specific session (-r flag)
     async fn handle_resume_session(cli: Cli, session_id: &str) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_core::session::SessionStore;
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::AiClient;
+        use claude_rust_core::session::SessionStore;
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::AiClient;
         use crate::interactive::InteractiveSession;
         use std::sync::Arc;
 
@@ -1128,9 +1128,9 @@ impl CommandHandler {
 
     /// Handle interactive mode with initial prompt
     async fn handle_interactive_with_prompt(cli: Cli, prompt: &str) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::AiClient;
-        use claude_code_core::session::SessionStore;
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::AiClient;
+        use claude_rust_core::session::SessionStore;
         use crate::interactive::InteractiveSession;
         use std::sync::Arc;
 
@@ -1161,9 +1161,9 @@ impl CommandHandler {
     /// Handle pure interactive mode (no arguments)
     async fn handle_interactive_mode(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
         use crate::interactive::InteractiveSession;
-        use claude_code_core::session::SessionStore;
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::AiClient;
+        use claude_rust_core::session::SessionStore;
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::AiClient;
         use std::sync::Arc;
 
         // Initialize components
@@ -1180,7 +1180,7 @@ impl CommandHandler {
 
     /// Handle authentication commands
     async fn handle_auth_command(command: AuthCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         use dialoguer::{Input, Password, Confirm};
 
         let auth_manager = AuthManager::with_defaults();
@@ -1261,7 +1261,7 @@ impl CommandHandler {
                 if !found_any {
                     println!("  No authenticated accounts found");
                     println!();
-                    println!("Run 'claude-code auth login' to authenticate");
+                    println!("Run 'claude-rust auth login' to authenticate");
                 }
             }
             AuthCommands::Switch(args) => {
@@ -1274,8 +1274,8 @@ impl CommandHandler {
 
     /// Handle ask command
     async fn handle_ask_command(args: AskArgs) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::{AiClient, ProviderType};
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::{AiClient, ProviderType};
         
         info!("Ask command: question={}, provider={:?}", args.question, args.provider);
         
@@ -1284,7 +1284,7 @@ impl CommandHandler {
         
         // Check if authenticated
         if !auth_manager.has_credentials(&provider_str).await {
-            eprintln!("❌ Authentication required for {}. Use 'claude-code auth login {}' first.", provider_str, provider_str);
+            eprintln!("❌ Authentication required for {}. Use 'claude-rust auth login {}' first.", provider_str, provider_str);
             std::process::exit(1);
         }
         
@@ -1312,8 +1312,8 @@ impl CommandHandler {
         // Register the appropriate provider based on the provider string
         match provider_str.as_str() {
             "claude" => {
-                use claude_code_ai::ClaudeProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::ClaudeProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("claude", &api_key);
                 let provider = ClaudeProvider::new(config);
@@ -1321,8 +1321,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::Claude).await;
             },
             "openai" => {
-                use claude_code_ai::OpenAiProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::OpenAiProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("openai", &api_key);
                 let provider = OpenAiProvider::new(config);
@@ -1330,8 +1330,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::OpenAI).await;
             },
             "gemini" => {
-                use claude_code_ai::GeminiProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::GeminiProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("gemini", &api_key);
                 let provider = GeminiProvider::new(config);
@@ -1339,8 +1339,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::Gemini).await;
             },
             "qwen" => {
-                use claude_code_ai::QwenProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::QwenProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("qwen", &api_key);
                 let provider = QwenProvider::new(config);
@@ -1354,7 +1354,7 @@ impl CommandHandler {
         }
         
         // Create and send request
-        use claude_code_ai::types::{CompletionRequest, Message, MessageRole};
+        use claude_rust_ai::types::{CompletionRequest, Message, MessageRole};
         
         let messages = vec![Message {
             role: MessageRole::User,
@@ -1378,7 +1378,7 @@ impl CommandHandler {
             Err(e) => {
                 eprintln!("❌ API Error: {}", e);
                 if e.to_string().contains("authentication") {
-                    eprintln!("💡 Try logging in again with: claude-code auth login {}", provider_str);
+                    eprintln!("💡 Try logging in again with: claude-rust auth login {}", provider_str);
                 }
             }
         }
@@ -1388,8 +1388,8 @@ impl CommandHandler {
 
     /// Handle explain command
     async fn handle_explain_command(args: ExplainArgs) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
-        use claude_code_ai::{AiClient, ProviderType};
+        use claude_rust_auth::AuthManager;
+        use claude_rust_ai::{AiClient, ProviderType};
         use std::path::Path;
         use std::fs;
         
@@ -1400,7 +1400,7 @@ impl CommandHandler {
         
         // Check if authenticated
         if !auth_manager.has_credentials(&provider_str).await {
-            eprintln!("❌ Authentication required for {}. Use 'claude-code auth login {}' first.", provider_str, provider_str);
+            eprintln!("❌ Authentication required for {}. Use 'claude-rust auth login {}' first.", provider_str, provider_str);
             std::process::exit(1);
         }
         
@@ -1446,8 +1446,8 @@ impl CommandHandler {
         // Register the appropriate provider based on the provider string
         match provider_str.as_str() {
             "claude" => {
-                use claude_code_ai::ClaudeProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::ClaudeProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("claude", &api_key);
                 let provider = ClaudeProvider::new(config);
@@ -1455,8 +1455,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::Claude).await;
             },
             "openai" => {
-                use claude_code_ai::OpenAiProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::OpenAiProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("openai", &api_key);
                 let provider = OpenAiProvider::new(config);
@@ -1464,8 +1464,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::OpenAI).await;
             },
             "gemini" => {
-                use claude_code_ai::GeminiProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::GeminiProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("gemini", &api_key);
                 let provider = GeminiProvider::new(config);
@@ -1473,8 +1473,8 @@ impl CommandHandler {
                 registry.set_default_provider(ProviderType::Gemini).await;
             },
             "qwen" => {
-                use claude_code_ai::QwenProvider;
-                use claude_code_ai::provider::ProviderConfig;
+                use claude_rust_ai::QwenProvider;
+                use claude_rust_ai::provider::ProviderConfig;
                 
                 let config = ProviderConfig::new("qwen", &api_key);
                 let provider = QwenProvider::new(config);
@@ -1488,7 +1488,7 @@ impl CommandHandler {
         }
         
         // Create and send request
-        use claude_code_ai::types::{CompletionRequest, Message, MessageRole};
+        use claude_rust_ai::types::{CompletionRequest, Message, MessageRole};
         
         let messages = vec![Message {
             role: MessageRole::User,
@@ -1512,7 +1512,7 @@ impl CommandHandler {
             Err(e) => {
                 eprintln!("❌ API Error: {}", e);
                 if e.to_string().contains("authentication") {
-                    eprintln!("💡 Try logging in again with: claude-code auth login {}", provider_str);
+                    eprintln!("💡 Try logging in again with: claude-rust auth login {}", provider_str);
                 }
             }
         }
@@ -1522,7 +1522,7 @@ impl CommandHandler {
 
     /// Handle sessions commands
     async fn handle_sessions_command(cmd: SessionsCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_core::session::SessionStore;
+        use claude_rust_core::session::SessionStore;
 
         let session_store = SessionStore::new(None)?;
 
@@ -1725,7 +1725,7 @@ impl CommandHandler {
 
     /// Handle login command (simple format: login provider api_key)
     async fn handle_login_command(args: LoginSimpleArgs) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         use dialoguer::Confirm;
         
         info!("Login command: provider={}, api_key=***", args.provider);
@@ -1750,7 +1750,7 @@ impl CommandHandler {
             // Set as default if no default is set
             // For simplicity, we'll just set this provider as default
             println!("✅ Set {} as default provider", args.provider);
-            println!("You can now use Claude Code commands");
+            println!("You can now use Claude-Rust commands");
         } else {
             eprintln!("❌ Failed to store API key");
             std::process::exit(1);
@@ -1761,7 +1761,7 @@ impl CommandHandler {
 
     /// Handle logout command (simple format: logout [provider])
     async fn handle_logout_command(args: LogoutSimpleArgs) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         
         info!("Logout command: provider={:?}", args.provider);
         
@@ -1783,10 +1783,10 @@ impl CommandHandler {
 
     /// Handle status command
     async fn handle_status_command() -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         use std::env;
         
-        println!("{}", "\n🔍 Claude Code Status:".bold());
+        println!("{}", "\n🔍 Claude-Rust Status:".bold());
         println!("  Platform: {} {}", env::consts::OS, env::consts::FAMILY);
         println!("  Rust: {}", env!("CARGO_PKG_VERSION"));
         
@@ -1819,7 +1819,7 @@ impl CommandHandler {
 
     /// Handle providers command to list all providers
     async fn handle_providers_command() -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         use colored::Colorize;
         
         println!("{}", "\n🤖 Available AI Providers:".bold());
@@ -1862,7 +1862,7 @@ impl CommandHandler {
 
     /// Handle provider switch command
     async fn handle_provider_switch_command(args: ProviderArgs) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_auth::AuthManager;
+        use claude_rust_auth::AuthManager;
         
         info!("Provider command: action={}, provider={:?}", args.action, args.provider);
         
@@ -1930,7 +1930,7 @@ impl CommandHandler {
 
     /// Handle config commands
     async fn handle_config_command(command: ConfigCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_core::config::{Config, ConfigLoader};
+        use claude_rust_core::config::{Config, ConfigLoader};
         use std::fs;
         use std::process::Command as ProcessCommand;
         use crate::settings::{SettingsManager, Settings};
@@ -2087,12 +2087,12 @@ impl CommandHandler {
                 let result = match key_parts.as_slice() {
                     ["log_level"] => {
                         config.log_level = match value_str.to_lowercase().as_str() {
-                            "error" => claude_code_core::config::LogLevel::Error,
-                            "warn" => claude_code_core::config::LogLevel::Warn,
-                            "info" => claude_code_core::config::LogLevel::Info,
-                            "verbose" => claude_code_core::config::LogLevel::Verbose,
-                            "debug" => claude_code_core::config::LogLevel::Debug,
-                            "trace" => claude_code_core::config::LogLevel::Trace,
+                            "error" => claude_rust_core::config::LogLevel::Error,
+                            "warn" => claude_rust_core::config::LogLevel::Warn,
+                            "info" => claude_rust_core::config::LogLevel::Info,
+                            "verbose" => claude_rust_core::config::LogLevel::Verbose,
+                            "debug" => claude_rust_core::config::LogLevel::Debug,
+                            "trace" => claude_rust_core::config::LogLevel::Trace,
                             _ => return Err(format!("Invalid log level: {}", value_str).into()),
                         };
                         Ok(())
@@ -2108,9 +2108,9 @@ impl CommandHandler {
                     }
                     ["terminal", "theme"] => {
                         config.terminal.theme = match value_str.to_lowercase().as_str() {
-                            "dark" => claude_code_core::config::Theme::Dark,
-                            "light" => claude_code_core::config::Theme::Light,
-                            "system" => claude_code_core::config::Theme::System,
+                            "dark" => claude_rust_core::config::Theme::Dark,
+                            "light" => claude_rust_core::config::Theme::Light,
+                            "system" => claude_rust_core::config::Theme::System,
                             _ => return Err(format!("Invalid theme: {}", value_str).into()),
                         };
                         Ok(())
@@ -3391,7 +3391,7 @@ impl CommandHandler {
 
     /// Handle MCP commands
     async fn handle_mcp_command(command: McpCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_mcp::{ServerConfig, McpConfig};
+        use claude_rust_mcp::{ServerConfig, McpConfig};
         use std::path::PathBuf;
 
         match command {
@@ -3500,7 +3500,7 @@ impl CommandHandler {
 
     /// Handle hooks commands
     async fn handle_hooks_command(command: HooksCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_hooks::{HooksConfig, HookExecutor, HookContext, HookPoint};
+        use claude_rust_hooks::{HooksConfig, HookExecutor, HookContext, HookPoint};
         use std::path::PathBuf;
 
         match command {
@@ -3708,7 +3708,7 @@ impl CommandHandler {
 
     /// Handle tasks command
     async fn handle_tasks_command(command: TasksCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_tasks::{TaskExecutor, Task, TaskStatus};
+        use claude_rust_tasks::{TaskExecutor, Task, TaskStatus};
         use std::str::FromStr;
 
         // Create a global executor instance (in real implementation, this would be shared)
@@ -3822,7 +3822,7 @@ impl CommandHandler {
                 // Parse task ID
                 let uuid = Uuid::from_str(&task_id)
                     .map_err(|_| "Invalid task ID format")?;
-                let task_id = claude_code_tasks::TaskId::from(uuid);
+                let task_id = claude_rust_tasks::TaskId::from(uuid);
 
                 if let Some(task) = executor.get_status(task_id).await {
                     println!("\n📋 Task Details:\n");
@@ -3859,7 +3859,7 @@ impl CommandHandler {
                 // Parse task ID
                 let uuid = Uuid::from_str(&task_id)
                     .map_err(|_| "Invalid task ID format")?;
-                let task_id_parsed = claude_code_tasks::TaskId::from(uuid);
+                let task_id_parsed = claude_rust_tasks::TaskId::from(uuid);
 
                 match executor.cancel(task_id_parsed).await {
                     Ok(()) => {
@@ -3876,7 +3876,7 @@ impl CommandHandler {
 
     /// Handle agents command
     async fn handle_agents_command(command: AgentsCommands) -> Result<(), Box<dyn std::error::Error>> {
-        use claude_code_agents::{AgentRegistry, Agent, AgentType, AgentStatus};
+        use claude_rust_agents::{AgentRegistry, Agent, AgentType, AgentStatus};
         use std::str::FromStr;
 
         // Create global registry (in real implementation, this would be shared)
@@ -3957,7 +3957,7 @@ impl CommandHandler {
 
                 let uuid = Uuid::from_str(&agent_id)
                     .map_err(|_| "Invalid agent ID format")?;
-                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+                let agent_id_parsed = claude_rust_agents::AgentId::from(uuid);
 
                 if let Some(agent) = registry.get(agent_id_parsed).await {
                     println!("\n🤖 Agent Details:\n");
@@ -4030,7 +4030,7 @@ impl CommandHandler {
 
                 let uuid = Uuid::from_str(&agent_id)
                     .map_err(|_| "Invalid agent ID format")?;
-                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+                let agent_id_parsed = claude_rust_agents::AgentId::from(uuid);
 
                 match registry.unregister(agent_id_parsed).await {
                     Ok(()) => {
@@ -4047,7 +4047,7 @@ impl CommandHandler {
 
                 let uuid = Uuid::from_str(&agent_id)
                     .map_err(|_| "Invalid agent ID format")?;
-                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+                let agent_id_parsed = claude_rust_agents::AgentId::from(uuid);
 
                 if let Some(mut agent) = registry.get(agent_id_parsed).await {
                     agent.pause();
@@ -4063,7 +4063,7 @@ impl CommandHandler {
 
                 let uuid = Uuid::from_str(&agent_id)
                     .map_err(|_| "Invalid agent ID format")?;
-                let agent_id_parsed = claude_code_agents::AgentId::from(uuid);
+                let agent_id_parsed = claude_rust_agents::AgentId::from(uuid);
 
                 if let Some(mut agent) = registry.get(agent_id_parsed).await {
                     agent.resume();

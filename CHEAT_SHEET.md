@@ -1,217 +1,217 @@
-# Claude Code Rust - Quick Reference Cheat Sheet
+# Claude-Rust Rust - Quick Reference Cheat Sheet
 
 ## Installation
 
 ```bash
 # Install from source
-git clone https://github.com/anthropic/claude-code-rust
-cd claude-code-rust
+git clone https://github.com/anthropic/claude-rust-rust
+cd claude-rust-rust
 ./install.sh
 
 # Or build manually
-cargo build --release --package claude-code-cli
+cargo build --release --package claude-rust-cli
 ```
 
 ## Authentication
 
 ```bash
 # Login to provider
-claude-code auth login              # Interactive
-claude-code auth login claude       # Claude (Anthropic)
-claude-code auth login openai       # OpenAI
-claude-code auth login gemini       # Google Gemini
+claude-rust auth login              # Interactive
+claude-rust auth login claude       # Claude (Anthropic)
+claude-rust auth login openai       # OpenAI
+claude-rust auth login gemini       # Google Gemini
 
 # Check auth status
-claude-code auth status
+claude-rust auth status
 
 # Switch providers
-claude-code auth switch <provider>
+claude-rust auth switch <provider>
 
 # Logout
-claude-code auth logout
+claude-rust auth logout
 ```
 
 ## Basic Usage
 
 ```bash
 # Ask a question
-claude-code ask "How do I use async/await in Rust?"
+claude-rust ask "How do I use async/await in Rust?"
 
 # Explain code
-claude-code explain src/main.rs
-claude-code explain "fn main() { println!(\"Hello\"); }"
+claude-rust explain src/main.rs
+claude-rust explain "fn main() { println!(\"Hello\"); }"
 
 # Interactive chat
-claude-code chat
+claude-rust chat
 ```
 
 ## Codebase Analysis
 
 ```bash
 # Scan codebase
-claude-code codebase scan
-claude-code codebase scan --max-depth 3
+claude-rust codebase scan
+claude-rust codebase scan --max-depth 3
 
 # Show stats
-claude-code codebase stats
+claude-rust codebase stats
 
 # Index codebase
-claude-code codebase index
+claude-rust codebase index
 ```
 
 ## File Operations
 
 ```bash
 # Read file
-claude-code file read <path>
-claude-code file read --lines 10-20 <path>
+claude-rust file read <path>
+claude-rust file read --lines 10-20 <path>
 
 # Write file
-claude-code file write <path> --content "text"
-echo "content" | claude-code file write <path>
+claude-rust file write <path> --content "text"
+echo "content" | claude-rust file write <path>
 
 # Edit file
-claude-code file edit <path> \
+claude-rust file edit <path> \
   --find "old" \
   --replace "new"
 
 # Search files
-claude-code file search "pattern"
-claude-code file search "fn main" --type rs
+claude-rust file search "pattern"
+claude-rust file search "fn main" --type rs
 ```
 
 ## Git Operations
 
 ```bash
 # Status
-claude-code git status
+claude-rust git status
 
 # Commit
-claude-code git commit -m "message"
+claude-rust git commit -m "message"
 
 # Diff
-claude-code git diff
-claude-code git diff --staged
+claude-rust git diff
+claude-rust git diff --staged
 
 # Log
-claude-code git log
-claude-code git log --limit 10
+claude-rust git log
+claude-rust git log --limit 10
 
 # Branch
-claude-code git branch              # List
-claude-code git branch <name>       # Create
+claude-rust git branch              # List
+claude-rust git branch <name>       # Create
 
 # Push/Pull
-claude-code git push
-claude-code git pull
+claude-rust git push
+claude-rust git pull
 ```
 
 ## Sessions
 
 ```bash
 # List sessions
-claude-code sessions list
-claude-code sessions list --limit 10
+claude-rust sessions list
+claude-rust sessions list --limit 10
 
 # Show session
-claude-code sessions show <id>
+claude-rust sessions show <id>
 
 # Resume session
-claude-code sessions resume <id>
+claude-rust sessions resume <id>
 
 # Delete session
-claude-code sessions delete <id>
-claude-code sessions delete --all
+claude-rust sessions delete <id>
+claude-rust sessions delete --all
 ```
 
 ## Configuration
 
 ```bash
 # Show config
-claude-code config show
-claude-code config show api.timeout
+claude-rust config show
+claude-rust config show api.timeout
 
 # Set config
-claude-code config set api.timeout 30
-claude-code config set ui.colors true
+claude-rust config set api.timeout 30
+claude-rust config set ui.colors true
 
 # Reset config
-claude-code config reset
-claude-code config reset api.timeout
+claude-rust config reset
+claude-rust config reset api.timeout
 ```
 
 ## Providers
 
 ```bash
 # List providers
-claude-code providers list
+claude-rust providers list
 
 # Show provider details
-claude-code providers show claude
+claude-rust providers show claude
 
 # Test provider
-claude-code providers test openai
+claude-rust providers test openai
 
 # Set default provider
-claude-code providers default gemini
+claude-rust providers default gemini
 ```
 
 ## MCP (Model Context Protocol)
 
 ```bash
 # List MCP servers
-claude-code mcp list
+claude-rust mcp list
 
 # Check server status
-claude-code mcp status <server>
+claude-rust mcp status <server>
 
 # List resources
-claude-code mcp resources <server>
+claude-rust mcp resources <server>
 
 # List tools
-claude-code mcp tools <server>
+claude-rust mcp tools <server>
 ```
 
 ## Hooks
 
 ```bash
 # List hooks
-claude-code hooks list
-claude-code hooks list --type pre-commit
+claude-rust hooks list
+claude-rust hooks list --type pre-commit
 
 # Show hook
-claude-code hooks show <name>
+claude-rust hooks show <name>
 
 # Enable/disable hook
-claude-code hooks enable <name>
-claude-code hooks disable <name>
+claude-rust hooks enable <name>
+claude-rust hooks disable <name>
 
 # Test hook
-claude-code hooks test <name>
+claude-rust hooks test <name>
 ```
 
 ## Tasks & Agents
 
 ```bash
 # List tasks
-claude-code tasks list
-claude-code tasks list --status running
+claude-rust tasks list
+claude-rust tasks list --status running
 
 # Show task
-claude-code tasks show <id>
+claude-rust tasks show <id>
 
 # Cancel task
-claude-code tasks cancel <id>
+claude-rust tasks cancel <id>
 
 # List agents
-claude-code agents list
-claude-code agents list --type code-review
+claude-rust agents list
+claude-rust agents list --type code-review
 
 # Show agent
-claude-code agents show <id>
+claude-rust agents show <id>
 
 # Agent stats
-claude-code agents stats
+claude-rust agents stats
 ```
 
 ## Global Flags
@@ -239,10 +239,10 @@ export CLAUDE_CODE_LOG_LEVEL="debug"      # Log level
 
 ```bash
 # Linux/macOS
-~/.config/claude-code/config.toml
+~/.config/claude-rust/config.toml
 
 # Windows
-%APPDATA%\claude-code\config.toml
+%APPDATA%\claude-rust\config.toml
 ```
 
 ## Common Config Options
@@ -279,33 +279,33 @@ default_model = "gpt-4"
 
 ### 1. Setup
 ```bash
-claude-code auth login claude
-claude-code codebase scan
+claude-rust auth login claude
+claude-rust codebase scan
 ```
 
 ### 2. Ask Question
 ```bash
-claude-code ask "How do I implement X?"
+claude-rust ask "How do I implement X?"
 ```
 
 ### 3. Git Workflow
 ```bash
-claude-code git status
-claude-code git commit -m "feat: add feature"
-claude-code git push
+claude-rust git status
+claude-rust git commit -m "feat: add feature"
+claude-rust git push
 ```
 
 ### 4. Code Analysis
 ```bash
-claude-code codebase scan
-claude-code codebase stats
-claude-code file search "TODO"
+claude-rust codebase scan
+claude-rust codebase stats
+claude-rust file search "TODO"
 ```
 
 ### 5. Session Management
 ```bash
-claude-code sessions list
-claude-code sessions resume <id>
+claude-rust sessions list
+claude-rust sessions resume <id>
 ```
 
 ## Keyboard Shortcuts (Interactive Mode)
@@ -324,10 +324,10 @@ Ctrl+D    Exit
 ```bash
 # Enable verbose logging
 export RUST_LOG=debug
-claude-code ask "test"
+claude-rust ask "test"
 
 # Or use flag
-claude-code --verbose ask "test"
+claude-rust --verbose ask "test"
 
 # Maximum verbosity
 export RUST_LOG=trace
@@ -337,24 +337,24 @@ export RUST_LOG=trace
 
 ```bash
 # Linux/macOS
-~/.local/share/claude-code/logs/latest.log
+~/.local/share/claude-rust/logs/latest.log
 
 # Windows
-%APPDATA%\claude-code\logs\latest.log
+%APPDATA%\claude-rust\logs\latest.log
 
 # View logs
-tail -f ~/.local/share/claude-code/logs/latest.log
+tail -f ~/.local/share/claude-rust/logs/latest.log
 ```
 
 ## Getting Help
 
 ```bash
 # Command help
-claude-code --help
-claude-code <command> --help
+claude-rust --help
+claude-rust <command> --help
 
 # Report issues
-https://github.com/anthropic/claude-code-rust/issues
+https://github.com/anthropic/claude-rust-rust/issues
 ```
 
 ## Tips
@@ -362,9 +362,9 @@ https://github.com/anthropic/claude-code-rust/issues
 - Use `--verbose` for debugging
 - Set `RUST_LOG=debug` for detailed logs
 - Use tab completion (if enabled)
-- Check `~/.config/claude-code/config.toml` for config
-- Use `claude-code config show` to see all settings
-- Run `claude-code auth status` to check auth state
+- Check `~/.config/claude-rust/config.toml` for config
+- Use `claude-rust config show` to see all settings
+- Run `claude-rust auth status` to check auth state
 - Use `--help` with any command for details
 
 ## See Also

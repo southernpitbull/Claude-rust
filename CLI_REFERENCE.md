@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command-line reference for Claude Code Rust.
+Complete command-line reference for Claude-Rust Rust.
 
 ## Table of Contents
 
@@ -44,30 +44,30 @@ Manage authentication with AI providers.
 
 **`auth login [provider]`**
 ```bash
-claude-code auth login          # Interactive provider selection
-claude-code auth login claude   # Login to Claude
-claude-code auth login openai   # Login to OpenAI
+claude-rust auth login          # Interactive provider selection
+claude-rust auth login claude   # Login to Claude
+claude-rust auth login openai   # Login to OpenAI
 ```
 
 **`auth logout [provider]`**
 ```bash
-claude-code auth logout         # Logout from current provider
-claude-code auth logout claude  # Logout from specific provider
+claude-rust auth logout         # Logout from current provider
+claude-rust auth logout claude  # Logout from specific provider
 ```
 
 **`auth status`**
 ```bash
-claude-code auth status         # Show authentication status
+claude-rust auth status         # Show authentication status
 ```
 
 **`auth switch <provider>`**
 ```bash
-claude-code auth switch openai  # Switch to OpenAI
+claude-rust auth switch openai  # Switch to OpenAI
 ```
 
 **`auth list`**
 ```bash
-claude-code auth list           # List all accounts
+claude-rust auth list           # List all accounts
 ```
 
 ---
@@ -77,9 +77,9 @@ claude-code auth list           # List all accounts
 Ask a single question to the AI.
 
 ```bash
-claude-code ask "What is Rust?"
-claude-code ask "Explain async/await" --provider openai
-claude-code ask "How do I parse JSON?" --model gpt-4
+claude-rust ask "What is Rust?"
+claude-rust ask "Explain async/await" --provider openai
+claude-rust ask "How do I parse JSON?" --model gpt-4
 ```
 
 **Flags:**
@@ -94,8 +94,8 @@ claude-code ask "How do I parse JSON?" --model gpt-4
 Get code explanation.
 
 ```bash
-claude-code explain src/main.rs
-claude-code explain "fn main() { println!(\"Hello\"); }"
+claude-rust explain src/main.rs
+claude-rust explain "fn main() { println!(\"Hello\"); }"
 ```
 
 **Flags:**
@@ -109,8 +109,8 @@ claude-code explain "fn main() { println!(\"Hello\"); }"
 Start interactive chat mode.
 
 ```bash
-claude-code chat
-claude-code chat --provider gemini
+claude-rust chat
+claude-rust chat --provider gemini
 ```
 
 **Interactive Commands:**
@@ -127,24 +127,24 @@ Manage conversation sessions.
 
 **`sessions list`**
 ```bash
-claude-code sessions list       # List all sessions
-claude-code sessions list --limit 10
+claude-rust sessions list       # List all sessions
+claude-rust sessions list --limit 10
 ```
 
 **`sessions show <id>`**
 ```bash
-claude-code sessions show abc123
+claude-rust sessions show abc123
 ```
 
 **`sessions resume <id>`**
 ```bash
-claude-code sessions resume abc123
+claude-rust sessions resume abc123
 ```
 
 **`sessions delete <id>`**
 ```bash
-claude-code sessions delete abc123
-claude-code sessions delete --all  # Delete all sessions
+claude-rust sessions delete abc123
+claude-rust sessions delete --all  # Delete all sessions
 ```
 
 ---
@@ -155,22 +155,22 @@ Manage AI providers.
 
 **`providers list`**
 ```bash
-claude-code providers list      # List all providers
+claude-rust providers list      # List all providers
 ```
 
 **`providers show <name>`**
 ```bash
-claude-code providers show claude
+claude-rust providers show claude
 ```
 
 **`providers test <name>`**
 ```bash
-claude-code providers test openai
+claude-rust providers test openai
 ```
 
 **`providers default <name>`**
 ```bash
-claude-code providers default gemini
+claude-rust providers default gemini
 ```
 
 ---
@@ -181,20 +181,20 @@ Manage configuration.
 
 **`config show`**
 ```bash
-claude-code config show         # Show all config
-claude-code config show api.timeout
+claude-rust config show         # Show all config
+claude-rust config show api.timeout
 ```
 
 **`config set <key> <value>`**
 ```bash
-claude-code config set api.timeout 30
-claude-code config set ui.colors true
+claude-rust config set api.timeout 30
+claude-rust config set ui.colors true
 ```
 
 **`config reset`**
 ```bash
-claude-code config reset        # Reset to defaults
-claude-code config reset api.timeout
+claude-rust config reset        # Reset to defaults
+claude-rust config reset api.timeout
 ```
 
 ---
@@ -205,25 +205,25 @@ Codebase analysis operations.
 
 **`codebase scan`**
 ```bash
-claude-code codebase scan
-claude-code codebase scan --max-depth 3
-claude-code codebase scan --include-hidden
+claude-rust codebase scan
+claude-rust codebase scan --max-depth 3
+claude-rust codebase scan --include-hidden
 ```
 
 **`codebase index`**
 ```bash
-claude-code codebase index
-claude-code codebase index --output index.json
+claude-rust codebase index
+claude-rust codebase index --output index.json
 ```
 
 **`codebase analyze`**
 ```bash
-claude-code codebase analyze
+claude-rust codebase analyze
 ```
 
 **`codebase stats`**
 ```bash
-claude-code codebase stats      # Show codebase statistics
+claude-rust codebase stats      # Show codebase statistics
 ```
 
 ---
@@ -234,27 +234,27 @@ File operations.
 
 **`file read <path>`**
 ```bash
-claude-code file read src/main.rs
-claude-code file read --lines 10-20 src/main.rs
+claude-rust file read src/main.rs
+claude-rust file read --lines 10-20 src/main.rs
 ```
 
 **`file write <path>`**
 ```bash
-claude-code file write output.txt --content "Hello World"
-echo "content" | claude-code file write output.txt
+claude-rust file write output.txt --content "Hello World"
+echo "content" | claude-rust file write output.txt
 ```
 
 **`file edit <path>`**
 ```bash
-claude-code file edit src/main.rs \
+claude-rust file edit src/main.rs \
   --find "old text" \
   --replace "new text"
 ```
 
 **`file search <pattern>`**
 ```bash
-claude-code file search "TODO"
-claude-code file search "fn main" --type rs
+claude-rust file search "TODO"
+claude-rust file search "fn main" --type rs
 ```
 
 ---
@@ -264,9 +264,9 @@ claude-code file search "fn main" --type rs
 Execute shell commands.
 
 ```bash
-claude-code bash "ls -la"
-claude-code bash "npm install" --timeout 60
-claude-code bash "cargo build" --working-dir /path/to/project
+claude-rust bash "ls -la"
+claude-rust bash "npm install" --timeout 60
+claude-rust bash "cargo build" --working-dir /path/to/project
 ```
 
 **Flags:**
@@ -282,46 +282,46 @@ Git operations.
 
 **`git status`**
 ```bash
-claude-code git status
+claude-rust git status
 ```
 
 **`git log`**
 ```bash
-claude-code git log
-claude-code git log --limit 10
-claude-code git log --since "2 days ago"
+claude-rust git log
+claude-rust git log --limit 10
+claude-rust git log --since "2 days ago"
 ```
 
 **`git diff`**
 ```bash
-claude-code git diff
-claude-code git diff --staged
-claude-code git diff HEAD~1
+claude-rust git diff
+claude-rust git diff --staged
+claude-rust git diff HEAD~1
 ```
 
 **`git branch`**
 ```bash
-claude-code git branch          # List branches
-claude-code git branch feature  # Create branch
-claude-code git branch -d old   # Delete branch
+claude-rust git branch          # List branches
+claude-rust git branch feature  # Create branch
+claude-rust git branch -d old   # Delete branch
 ```
 
 **`git commit`**
 ```bash
-claude-code git commit -m "feat: add feature"
-claude-code git commit --amend
+claude-rust git commit -m "feat: add feature"
+claude-rust git commit --amend
 ```
 
 **`git push`**
 ```bash
-claude-code git push
-claude-code git push origin main
+claude-rust git push
+claude-rust git push origin main
 ```
 
 **`git pull`**
 ```bash
-claude-code git pull
-claude-code git pull --rebase
+claude-rust git pull
+claude-rust git pull --rebase
 ```
 
 ---
@@ -332,22 +332,22 @@ Model Context Protocol operations.
 
 **`mcp list`**
 ```bash
-claude-code mcp list            # List MCP servers
+claude-rust mcp list            # List MCP servers
 ```
 
 **`mcp status <server>`**
 ```bash
-claude-code mcp status filesystem
+claude-rust mcp status filesystem
 ```
 
 **`mcp resources <server>`**
 ```bash
-claude-code mcp resources filesystem
+claude-rust mcp resources filesystem
 ```
 
 **`mcp tools <server>`**
 ```bash
-claude-code mcp tools filesystem
+claude-rust mcp tools filesystem
 ```
 
 ---
@@ -358,28 +358,28 @@ Manage lifecycle hooks.
 
 **`hooks list`**
 ```bash
-claude-code hooks list
-claude-code hooks list --type pre-commit
+claude-rust hooks list
+claude-rust hooks list --type pre-commit
 ```
 
 **`hooks show <name>`**
 ```bash
-claude-code hooks show linting
+claude-rust hooks show linting
 ```
 
 **`hooks enable <name>`**
 ```bash
-claude-code hooks enable linting
+claude-rust hooks enable linting
 ```
 
 **`hooks disable <name>`**
 ```bash
-claude-code hooks disable linting
+claude-rust hooks disable linting
 ```
 
 **`hooks test <name>`**
 ```bash
-claude-code hooks test linting
+claude-rust hooks test linting
 ```
 
 ---
@@ -390,18 +390,18 @@ Manage background tasks.
 
 **`tasks list`**
 ```bash
-claude-code tasks list
-claude-code tasks list --status running
+claude-rust tasks list
+claude-rust tasks list --status running
 ```
 
 **`tasks show <id>`**
 ```bash
-claude-code tasks show task-123
+claude-rust tasks show task-123
 ```
 
 **`tasks cancel <id>`**
 ```bash
-claude-code tasks cancel task-123
+claude-rust tasks cancel task-123
 ```
 
 ---
@@ -412,25 +412,25 @@ Manage AI agents.
 
 **`agents list`**
 ```bash
-claude-code agents list
-claude-code agents list --type code-review
+claude-rust agents list
+claude-rust agents list --type code-review
 ```
 
 **`agents show <id>`**
 ```bash
-claude-code agents show agent-123
+claude-rust agents show agent-123
 ```
 
 **`agents register`**
 ```bash
-claude-code agents register \
+claude-rust agents register \
   --type code-review \
   --name "My Reviewer"
 ```
 
 **`agents stats`**
 ```bash
-claude-code agents stats
+claude-rust agents stats
 ```
 
 ---
@@ -438,8 +438,8 @@ claude-code agents stats
 ## Configuration File
 
 Configuration is stored in:
-- Linux/macOS: `~/.config/claude-code/config.toml`
-- Windows: `%APPDATA%\claude-code\config.toml`
+- Linux/macOS: `~/.config/claude-rust/config.toml`
+- Windows: `%APPDATA%\claude-rust\config.toml`
 
 Example configuration:
 
@@ -494,31 +494,31 @@ default_model = "gpt-4"
 
 **1. Setup and authenticate:**
 ```bash
-claude-code auth login claude
+claude-rust auth login claude
 ```
 
 **2. Ask a question:**
 ```bash
-claude-code ask "How do I implement a binary tree in Rust?"
+claude-rust ask "How do I implement a binary tree in Rust?"
 ```
 
 **3. Analyze codebase:**
 ```bash
-claude-code codebase scan
-claude-code codebase stats
+claude-rust codebase scan
+claude-rust codebase stats
 ```
 
 **4. Git workflow:**
 ```bash
-claude-code git status
-claude-code git commit -m "feat: add new feature"
-claude-code git push
+claude-rust git status
+claude-rust git commit -m "feat: add new feature"
+claude-rust git push
 ```
 
 **5. Background tasks:**
 ```bash
-claude-code tasks list
-claude-code tasks show task-123
+claude-rust tasks list
+claude-rust tasks show task-123
 ```
 
 ---

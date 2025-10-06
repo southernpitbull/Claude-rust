@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `claude-code-auth` OAuth module provides secure, production-ready OAuth 2.0 implementations for Claude, OpenAI, Gemini, and Qwen providers.
+The `claude-rust-auth` OAuth module provides secure, production-ready OAuth 2.0 implementations for Claude, OpenAI, Gemini, and Qwen providers.
 
 ## Features
 
@@ -291,12 +291,12 @@ if token.is_expired() {
 
 Run all OAuth tests:
 ```bash
-cargo test --package claude-code-auth --lib oauth
+cargo test --package claude-rust-auth --lib oauth
 ```
 
 Run provider-specific tests:
 ```bash
-cargo test --package claude-code-auth --lib oauth::providers
+cargo test --package claude-rust-auth --lib oauth::providers
 ```
 
 ### Example Usage
@@ -312,7 +312,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-claude-code-auth = { path = "../auth" }
+claude-rust-auth = { path = "../auth" }
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -321,7 +321,7 @@ tokio = { version = "1", features = ["full"] }
 - [OAuth 2.0 RFC 6749](https://tools.ietf.org/html/rfc6749)
 - [PKCE RFC 7636](https://tools.ietf.org/html/rfc7636)
 - [Security Audit Report](./OAUTH_SECURITY_AUDIT.md)
-- [Full API Documentation](https://docs.rs/claude-code-auth)
+- [Full API Documentation](https://docs.rs/claude-rust-auth)
 
 ## Support
 

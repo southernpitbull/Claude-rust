@@ -10,7 +10,7 @@
 //! # Examples
 //!
 //! ```no_run
-//! use claude_code_terminal::{Formatter, Spinner, Prompt, Table};
+//! use claude_rust_terminal::{Formatter, Spinner, Prompt, Table};
 //!
 //! // Format colored output
 //! let formatter = Formatter::new(true);

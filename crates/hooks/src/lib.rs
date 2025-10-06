@@ -1,4 +1,4 @@
-//! Hooks System for Claude Code
+//! Hooks System for Claude-Rust
 //!
 //! This module provides a flexible hooks system that allows executing
 //! custom code at specific points in the application lifecycle.

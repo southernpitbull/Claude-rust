@@ -1,5 +1,5 @@
 [package]
-name = "claude-code-ai"
+name = "claude-rust-ai"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,9 +8,9 @@ repository.workspace = true
 
 [dependencies]
 # Workspace crates
-claude-code-core = { path = "../core" }
-claude-code-auth = { path = "../auth" }
-claude-code-utils = { path = "../utils" }
+claude-rust-core = { path = "../core" }
+claude-rust-auth = { path = "../auth" }
+claude-rust-utils = { path = "../utils" }
 
 # Workspace dependencies
 tokio = { workspace = true }

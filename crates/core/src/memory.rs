@@ -11,7 +11,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_core::memory::ClaudeMemory;
+//! use claude_rust_core::memory::ClaudeMemory;
 //!
 //! # async fn example() -> anyhow::Result<()> {
 //! let mut memory = ClaudeMemory::new();
@@ -127,7 +127,7 @@ impl ClaudeMemory {
     /// # Examples
     ///
     /// ```rust
-    /// use claude_code_core::memory::ClaudeMemory;
+    /// use claude_rust_core::memory::ClaudeMemory;
     ///
     /// let memory = ClaudeMemory::new();
     /// ```
@@ -170,7 +170,7 @@ impl ClaudeMemory {
     /// # Examples
     ///
     /// ```rust
-    /// use claude_code_core::memory::ClaudeMemory;
+    /// use claude_rust_core::memory::ClaudeMemory;
     ///
     /// # fn example() -> anyhow::Result<()> {
     /// let mut memory = ClaudeMemory::new();
@@ -345,7 +345,7 @@ impl ClaudeMemory {
     /// # Examples
     ///
     /// ```rust
-    /// use claude_code_core::memory::ClaudeMemory;
+    /// use claude_rust_core::memory::ClaudeMemory;
     ///
     /// # fn example() -> anyhow::Result<()> {
     /// let mut memory = ClaudeMemory::new();

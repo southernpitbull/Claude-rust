@@ -6,7 +6,7 @@ use crate::error::{AuthError, AuthResult};
 use crate::oauth::TokenResponse;
 use crate::oauth_manager::OAuthManager;
 use crate::manager::AuthManager;
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 use std::sync::Arc;
 use tracing::{debug, info};
 
@@ -48,7 +48,7 @@ impl AuthWizard {
     /// in a higher-level crate that has access to terminal I/O.
     pub async fn run(&self) -> AuthResult<()> {
         info!("Starting authentication wizard");
-        info!("Welcome to Claude Code Authentication Wizard");
+        info!("Welcome to Claude-Rust Authentication Wizard");
         info!("This wizard will help you set up authentication for AI providers");
 
         // This method is currently a placeholder for CLI integration

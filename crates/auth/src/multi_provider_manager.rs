@@ -8,7 +8,7 @@ use crate::oauth::TokenResponse;
 use crate::storage::{CredentialStore, TokenInfo};
 use crate::tokens::AuthToken;
 use crate::types::{AuthState};
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::{debug, info, warn};

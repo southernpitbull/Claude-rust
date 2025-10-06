@@ -1,5 +1,5 @@
 [package]
-name = "claude-code-hooks"
+name = "claude-rust-hooks"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions for Claude Code Rust.
+Common issues and solutions for Claude-Rust Rust.
 
 ## Table of Contents
 
@@ -53,7 +53,7 @@ sudo ./install.sh
 
 # Or install to user directory
 mkdir -p ~/.local/bin
-cp target/release/claude-code ~/.local/bin/
+cp target/release/claude-rust ~/.local/bin/
 ```
 
 ---
@@ -69,7 +69,7 @@ cp target/release/claude-code ~/.local/bin/
 2. Ensure port 8080 is available
 3. Try manual authentication:
    ```bash
-   claude-code auth login --manual
+   claude-rust auth login --manual
    ```
 
 ### API key not recognized
@@ -85,8 +85,8 @@ echo $CLAUDE_API_KEY
 export CLAUDE_API_KEY="your-key-here"
 
 # Re-authenticate
-claude-code auth logout
-claude-code auth login
+claude-rust auth logout
+claude-rust auth login
 ```
 
 ### Token expired
@@ -96,11 +96,11 @@ claude-code auth login
 **Solution:**
 ```bash
 # Logout and login again
-claude-code auth logout
-claude-code auth login
+claude-rust auth logout
+claude-rust auth login
 
 # Check token status
-claude-code auth status
+claude-rust auth status
 ```
 
 ### Cannot switch providers
@@ -110,10 +110,10 @@ claude-code auth status
 **Solution:**
 ```bash
 # Authenticate with the provider first
-claude-code auth login openai
+claude-rust auth login openai
 
 # Then switch
-claude-code auth switch openai
+claude-rust auth switch openai
 ```
 
 ---
@@ -127,7 +127,7 @@ claude-code auth switch openai
 **Solution:**
 ```bash
 # Increase timeout in config
-claude-code config set api.timeout 60
+claude-rust config set api.timeout 60
 
 # Check network connectivity
 ping api.anthropic.com
@@ -188,10 +188,10 @@ export HTTPS_PROXY=http://proxy.company.com:8080
 ```bash
 # Use release build (much faster)
 cargo build --release
-./target/release/claude-code
+./target/release/claude-rust
 
 # Check for network delays
-claude-code config set api.timeout 5
+claude-rust config set api.timeout 5
 ```
 
 ### High memory usage
@@ -201,13 +201,13 @@ claude-code config set api.timeout 5
 **Solution:**
 ```bash
 # Limit session history
-claude-code config set session.max_history 100
+claude-rust config set session.max_history 100
 
 # Clear old sessions
-claude-code sessions delete --older-than 30d
+claude-rust sessions delete --older-than 30d
 
 # Reduce codebase index size
-claude-code codebase scan --max-depth 3
+claude-rust codebase scan --max-depth 3
 ```
 
 ### Slow codebase scanning
@@ -217,14 +217,14 @@ claude-code codebase scan --max-depth 3
 **Solution:**
 ```bash
 # Limit scan depth
-claude-code codebase scan --max-depth 5
+claude-rust codebase scan --max-depth 5
 
 # Exclude directories
 echo "node_modules/" >> .gitignore
 echo "target/" >> .gitignore
 
 # Use smaller file size limit
-claude-code config set codebase.max_file_size 1048576  # 1MB
+claude-rust config set codebase.max_file_size 1048576  # 1MB
 ```
 
 ---
@@ -253,7 +253,7 @@ git config --global core.autocrlf true
 
 #### PATH not updated
 
-**Symptom:** `claude-code: command not found`
+**Symptom:** `claude-rust: command not found`
 
 **Solution:**
 1. Add to PATH manually:
@@ -266,12 +266,12 @@ git config --global core.autocrlf true
 
 #### Gatekeeper blocks binary
 
-**Symptom:** `"claude-code" cannot be opened because the developer cannot be verified`
+**Symptom:** `"claude-rust" cannot be opened because the developer cannot be verified`
 
 **Solution:**
 ```bash
 # Remove quarantine attribute
-xattr -d com.apple.quarantine /path/to/claude-code
+xattr -d com.apple.quarantine /path/to/claude-rust
 
 # Or allow in System Preferences:
 # System Preferences → Security & Privacy → Allow
@@ -283,7 +283,7 @@ xattr -d com.apple.quarantine /path/to/claude-code
 
 **Solution:**
 1. Open Keychain Access
-2. Find `claude-code` entries
+2. Find `claude-rust` entries
 3. Get Info → Access Control → Allow all applications
 
 ### Linux
@@ -317,7 +317,7 @@ sestatus
 sudo setenforce 0
 
 # Or set context
-chcon -t bin_t /path/to/claude-code
+chcon -t bin_t /path/to/claude-rust
 ```
 
 ---
@@ -387,7 +387,7 @@ cargo build
 pwd
 
 # Use absolute paths
-claude-code file read /absolute/path/to/file.rs
+claude-rust file read /absolute/path/to/file.rs
 
 # Check file permissions
 ls -la /path/to/file
@@ -406,7 +406,7 @@ cat config.json | jq .
 file config.json
 
 # Recreate config from template
-claude-code config reset
+claude-rust config reset
 ```
 
 ### Database/session errors
@@ -416,13 +416,13 @@ claude-code config reset
 **Solution:**
 ```bash
 # Backup sessions
-cp -r ~/.local/share/claude-code ~/.local/share/claude-code.backup
+cp -r ~/.local/share/claude-rust ~/.local/share/claude-rust.backup
 
 # Clear sessions
-claude-code sessions delete --all
+claude-rust sessions delete --all
 
 # Reset session storage
-rm -rf ~/.local/share/claude-code/sessions
+rm -rf ~/.local/share/claude-rust/sessions
 ```
 
 ---
@@ -433,7 +433,7 @@ rm -rf ~/.local/share/claude-code/sessions
 
 **Cause:** Not logged in to any provider
 
-**Fix:** Run `claude-code auth login`
+**Fix:** Run `claude-rust auth login`
 
 ### `Invalid configuration`
 
@@ -441,15 +441,15 @@ rm -rf ~/.local/share/claude-code/sessions
 
 **Fix:**
 ```bash
-claude-code config reset
-# Or manually edit: ~/.config/claude-code/config.toml
+claude-rust config reset
+# Or manually edit: ~/.config/claude-rust/config.toml
 ```
 
 ### `No provider selected`
 
 **Cause:** Haven't set a default provider
 
-**Fix:** `claude-code providers default claude`
+**Fix:** `claude-rust providers default claude`
 
 ### `Command execution timeout`
 
@@ -458,9 +458,9 @@ claude-code config reset
 **Fix:**
 ```bash
 # Increase timeout
-claude-code bash "long-command" --timeout 300
+claude-rust bash "long-command" --timeout 300
 # Or in config:
-claude-code config set execution.timeout 300
+claude-rust config set execution.timeout 300
 ```
 
 ### `File too large`
@@ -470,7 +470,7 @@ claude-code config set execution.timeout 300
 **Fix:**
 ```bash
 # Increase limit
-claude-code config set files.max_size 10485760  # 10MB
+claude-rust config set files.max_size 10485760  # 10MB
 ```
 
 ---
@@ -482,30 +482,30 @@ Enable verbose logging for troubleshooting:
 ```bash
 # Environment variable
 export RUST_LOG=debug
-claude-code ask "test"
+claude-rust ask "test"
 
 # Or use CLI flag
-claude-code --verbose ask "test"
+claude-rust --verbose ask "test"
 
 # Maximum verbosity
 export RUST_LOG=trace
-claude-code ask "test"
+claude-rust ask "test"
 ```
 
 ## Log Files
 
 Logs are stored in:
-- Linux: `~/.local/share/claude-code/logs/`
-- macOS: `~/Library/Application Support/claude-code/logs/`
-- Windows: `%APPDATA%\claude-code\logs\`
+- Linux: `~/.local/share/claude-rust/logs/`
+- macOS: `~/Library/Application Support/claude-rust/logs/`
+- Windows: `%APPDATA%\claude-rust\logs\`
 
 View recent logs:
 ```bash
 # Linux/macOS
-tail -f ~/.local/share/claude-code/logs/latest.log
+tail -f ~/.local/share/claude-rust/logs/latest.log
 
 # Windows
-Get-Content -Wait "$env:APPDATA\claude-code\logs\latest.log"
+Get-Content -Wait "$env:APPDATA\claude-rust\logs\latest.log"
 ```
 
 ---
@@ -514,12 +514,12 @@ Get-Content -Wait "$env:APPDATA\claude-code\logs\latest.log"
 
 If you're still experiencing issues:
 
-1. **Check existing issues:** https://github.com/anthropic/claude-code-rust/issues
+1. **Check existing issues:** https://github.com/anthropic/claude-rust-rust/issues
 
 2. **Create a new issue:** Include:
    - OS and version
    - Rust version (`rustc --version`)
-   - Claude Code version (`claude-code --version`)
+   - Claude-Rust version (`claude-rust --version`)
    - Full error message
    - Steps to reproduce
    - Relevant logs (with sensitive data removed)
@@ -534,13 +534,13 @@ If you're still experiencing issues:
    uname -a
    rustc --version
    cargo --version
-   claude-code --version
+   claude-rust --version
 
    # Configuration
-   claude-code config show
+   claude-rust config show
 
    # Auth status
-   claude-code auth status
+   claude-rust auth status
    ```
 
 ---
@@ -551,19 +551,19 @@ If all else fails, perform a clean reinstall:
 
 ```bash
 # 1. Backup configuration
-cp -r ~/.config/claude-code ~/claude-code-config-backup
+cp -r ~/.config/claude-rust ~/claude-rust-config-backup
 
 # 2. Backup sessions
-cp -r ~/.local/share/claude-code ~/claude-code-data-backup
+cp -r ~/.local/share/claude-rust ~/claude-rust-data-backup
 
 # 3. Uninstall
-rm ~/.local/bin/claude-code
-rm -rf ~/.config/claude-code
-rm -rf ~/.local/share/claude-code
+rm ~/.local/bin/claude-rust
+rm -rf ~/.config/claude-rust
+rm -rf ~/.local/share/claude-rust
 
 # 4. Reinstall
 ./install.sh
 
 # 5. Restore config if needed
-cp -r ~/claude-code-config-backup ~/.config/claude-code
+cp -r ~/claude-rust-config-backup ~/.config/claude-rust
 ```

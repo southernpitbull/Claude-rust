@@ -15,7 +15,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_utils::validation::*;
+//! use claude_rust_utils::validation::*;
 //!
 //! // Validate URLs
 //! assert!(is_valid_url("https://example.com"));
@@ -52,7 +52,7 @@ fn email_regex() -> &'static Regex {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_url;
+/// use claude_rust_utils::validation::is_valid_url;
 ///
 /// assert!(is_valid_url("https://example.com"));
 /// assert!(is_valid_url("http://localhost:8080/path"));
@@ -74,7 +74,7 @@ pub fn is_valid_url(url: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_url_with_schemes;
+/// use claude_rust_utils::validation::is_valid_url_with_schemes;
 ///
 /// let schemes = vec!["http", "https", "ftp"];
 /// assert!(is_valid_url_with_schemes("ftp://example.com", &schemes));
@@ -94,7 +94,7 @@ pub fn is_valid_url_with_schemes(url: &str, allowed_schemes: &[&str]) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_email;
+/// use claude_rust_utils::validation::is_valid_email;
 ///
 /// assert!(is_valid_email("user@example.com"));
 /// assert!(is_valid_email("first.last@subdomain.example.org"));
@@ -121,7 +121,7 @@ pub fn is_valid_email(email: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_api_key;
+/// use claude_rust_utils::validation::is_valid_api_key;
 ///
 /// assert!(is_valid_api_key("sk-1234567890abcdef", Some("sk-")));
 /// assert!(is_valid_api_key("api_key_12345", None));
@@ -155,7 +155,7 @@ pub fn is_valid_api_key(key: &str, expected_prefix: Option<&str>) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::validate_api_key;
+/// use claude_rust_utils::validation::validate_api_key;
 ///
 /// let result = validate_api_key("sk-1234567890abcdef", Some("sk-"), Some(16), Some(128));
 /// assert!(result.is_ok());
@@ -205,7 +205,7 @@ pub fn validate_api_key(
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_jwt_format;
+/// use claude_rust_utils::validation::is_valid_jwt_format;
 ///
 /// assert!(is_valid_jwt_format("eyJ.eyJ.SflK"));
 /// assert!(!is_valid_jwt_format("not-a-jwt"));
@@ -230,7 +230,7 @@ pub fn is_valid_jwt_format(token: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_hostname;
+/// use claude_rust_utils::validation::is_valid_hostname;
 ///
 /// assert!(is_valid_hostname("example.com"));
 /// assert!(is_valid_hostname("sub.example.com"));
@@ -271,7 +271,7 @@ pub fn is_valid_hostname(hostname: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_port;
+/// use claude_rust_utils::validation::is_valid_port;
 ///
 /// assert!(is_valid_port(80));
 /// assert!(is_valid_port(8080));
@@ -288,7 +288,7 @@ pub fn is_valid_port(port: u32) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_semver;
+/// use claude_rust_utils::validation::is_valid_semver;
 ///
 /// assert!(is_valid_semver("1.0.0"));
 /// assert!(is_valid_semver("1.2.3"));
@@ -310,7 +310,7 @@ pub fn is_valid_semver(version: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_ascii_string;
+/// use claude_rust_utils::validation::is_valid_ascii_string;
 ///
 /// assert!(is_valid_ascii_string("Hello World"));
 /// assert!(is_valid_ascii_string("test123"));
@@ -326,7 +326,7 @@ pub fn is_valid_ascii_string(text: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::validation::is_valid_hex;
+/// use claude_rust_utils::validation::is_valid_hex;
 ///
 /// assert!(is_valid_hex("abcdef123"));
 /// assert!(is_valid_hex("ABCDEF"));

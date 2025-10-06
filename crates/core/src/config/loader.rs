@@ -359,7 +359,7 @@ impl ConfigLoader {
 
         // Current directory
         if let Ok(cwd) = env::current_dir() {
-            paths.push(cwd.join(".claude-code.toml"));
+            paths.push(cwd.join(".claude-rust.toml"));
             paths.push(cwd.join(".claude-code.json"));
             paths.push(cwd.join(".claude-code.yaml"));
         }
@@ -373,7 +373,7 @@ impl ConfigLoader {
 
         // Home directory
         if let Ok(home) = Self::get_home_dir() {
-            paths.push(home.join(".claude-code.toml"));
+            paths.push(home.join(".claude-rust.toml"));
             paths.push(home.join(".claude-code.json"));
         }
 
@@ -714,7 +714,7 @@ mod tests {
         assert!(!paths.is_empty());
 
         // Should include current directory configs
-        assert!(paths.iter().any(|p| p.to_str().unwrap().contains(".claude-code.toml")));
+        assert!(paths.iter().any(|p| p.to_str().unwrap().contains(".claude-rust.toml")));
     }
 
     #[test]

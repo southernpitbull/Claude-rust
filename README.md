@@ -1,10 +1,10 @@
-# Claude Code - Rust Implementation
+# Claude-Rust - Rust Implementation
 
-A high-performance, memory-safe implementation of the Claude Code CLI tool written in Rust.
+A high-performance, memory-safe implementation of the Claude-Rust CLI tool written in Rust.
 
 ## Overview
 
-This is a complete rewrite of the Claude Code CLI from TypeScript/Node.js to Rust, providing:
+This is a complete rewrite of the Claude-Rust CLI from TypeScript/Node.js to Rust, providing:
 
 - **10-50x faster startup time** (Node.js ~200ms → Rust ~5-10ms)
 - **5-10x lower memory footprint** (Node.js ~50MB → Rust ~5-10MB)
@@ -135,7 +135,7 @@ See [todo.md](todo.md) for detailed implementation tracking.
 The project is organized as a Cargo workspace with the following crates:
 
 ```
-claude-code-rust/
+claude-rust-rust/
 ├── Cargo.toml          # Workspace configuration
 ├── crates/
 │   ├── cli/            # Binary crate - main entry point, command handlers
@@ -203,57 +203,57 @@ cargo install --path crates/cli
 
 # Or build and copy binary
 cargo build --release
-cp target/release/claude-code ~/.local/bin/
+cp target/release/claude-rust ~/.local/bin/
 ```
 
 ## Usage
 
 ```bash
 # Interactive mode
-claude-code
+claude-rust
 
 # Single-shot query
-claude-code ask "How do I implement a binary tree in Rust?"
+claude-rust ask "How do I implement a binary tree in Rust?"
 
 # Explain code
-claude-code explain src/main.rs
+claude-rust explain src/main.rs
 
 # Interactive chat
-claude-code chat
+claude-rust chat
 
 # List sessions
-claude-code sessions list
+claude-rust sessions list
 
 # Authentication
-claude-code auth login
-claude-code auth status
-claude-code auth switch
+claude-rust auth login
+claude-rust auth status
+claude-rust auth switch
 
 # Git operations
-claude-code git status
-claude-code git commit -m "feat: add new feature"
-claude-code git push
+claude-rust git status
+claude-rust git commit -m "feat: add new feature"
+claude-rust git push
 
 # MCP operations
-claude-code mcp list
-claude-code mcp connect <server-name>
-claude-code mcp resources <server-name>
+claude-rust mcp list
+claude-rust mcp connect <server-name>
+claude-rust mcp resources <server-name>
 
 # Hooks
-claude-code hooks list
-claude-code hooks enable <hook-name>
-claude-code hooks test <hook-name>
+claude-rust hooks list
+claude-rust hooks enable <hook-name>
+claude-rust hooks test <hook-name>
 
 # Background tasks
-claude-code tasks list
-claude-code tasks show <task-id>
+claude-rust tasks list
+claude-rust tasks show <task-id>
 ```
 
 ## Configuration
 
 Configuration files are stored in:
-- **Linux/macOS**: `~/.config/claude-code/`
-- **Windows**: `%APPDATA%\claude-code\`
+- **Linux/macOS**: `~/.config/claude-rust/`
+- **Windows**: `%APPDATA%\claude-rust\`
 
 ### Configuration Files
 
@@ -332,7 +332,7 @@ cargo clippy -- -D warnings
 cargo test
 
 # Run tests for a specific crate
-cargo test -p claude-code-core
+cargo test -p claude-rust-core
 
 # Run integration tests
 cargo test --test '*'
@@ -347,14 +347,14 @@ cargo test -- --show-output
 
 ```bash
 # Benchmark startup time (requires hyperfine)
-hyperfine --warmup 3 './target/release/claude-code --version'
+hyperfine --warmup 3 './target/release/claude-rust --version'
 ```
 
 ### Memory Usage
 
 ```bash
 # Linux
-/usr/bin/time -v ./target/release/claude-code --version
+/usr/bin/time -v ./target/release/claude-rust --version
 
 # Windows
 # Use Task Manager or Resource Monitor
@@ -364,7 +364,7 @@ hyperfine --warmup 3 './target/release/claude-code --version'
 
 ```bash
 # Check binary size
-ls -lh target/release/claude-code
+ls -lh target/release/claude-rust
 
 # Analyze binary composition (requires cargo-bloat)
 cargo bloat --release
@@ -461,7 +461,7 @@ MIT
 
 ## Acknowledgments
 
-- Original Claude Code CLI by Anthropic
+- Original Claude-Rust CLI by Anthropic
 - Rust community for excellent crates and tools
 - Contributors and testers
 

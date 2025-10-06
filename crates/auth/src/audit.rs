@@ -3,7 +3,7 @@
 //! Provides comprehensive logging of authentication events and account usage
 
 use chrono::{DateTime, Utc};
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fs::{File, OpenOptions};

@@ -1,7 +1,7 @@
 //! AI query and interactive mode handlers.
 
 use anyhow::{Context, Result};
-use claude_code_ai::{CompletionRequest, Message, MessageRole};
+use claude_rust_ai::{CompletionRequest, Message, MessageRole};
 use futures::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::io::Write;
@@ -81,7 +81,7 @@ pub async fn handle(app: &App) -> Result<()> {
 /// Handle streaming query with real-time output.
 async fn handle_streaming_query(
     app: &App,
-    client: &claude_code_ai::AIClient,
+    client: &claude_rust_ai::AIClient,
     request: AIRequest,
 ) -> Result<()> {
     let formatter = app.formatter();
@@ -131,7 +131,7 @@ async fn handle_streaming_query(
 /// Handle blocking query with progress indicator.
 async fn handle_blocking_query(
     app: &App,
-    client: &claude_code_ai::AIClient,
+    client: &claude_rust_ai::AIClient,
     request: AIRequest,
 ) -> Result<()> {
     let formatter = app.formatter();
@@ -200,7 +200,7 @@ pub async fn handle_interactive(app: &App) -> Result<()> {
     };
 
     // Print welcome message
-    formatter.print_header("Claude Code Interactive Session");
+    formatter.print_header("Claude-Rust Interactive Session");
     println!();
     formatter.print_info("Type your questions or commands. Use /help for available commands.");
     formatter.print_info("Press Ctrl+C or type /quit to exit.");

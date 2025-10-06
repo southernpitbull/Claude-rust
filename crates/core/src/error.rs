@@ -1,6 +1,6 @@
 //! Error Handling Module
 //!
-//! Provides a comprehensive, hierarchical error system for the Claude Code application.
+//! Provides a comprehensive, hierarchical error system for the Claude-Rust application.
 //! This module defines all error types, error conversion, and error context management.
 //!
 //! # Design Philosophy
@@ -14,7 +14,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_core::error::{AppError, AppResult, ErrorContext};
+//! use claude_rust_core::error::{AppError, AppResult, ErrorContext};
 //!
 //! fn authenticate() -> AppResult<String> {
 //!     // Authentication logic that may fail
@@ -36,7 +36,7 @@ use std::io;
 use std::path::PathBuf;
 use thiserror::Error;
 
-/// Primary error type for the Claude Code application.
+/// Primary error type for the Claude-Rust application.
 ///
 /// This enum represents all possible errors that can occur across different
 /// subsystems. Each variant includes relevant context and implements Display
@@ -395,7 +395,7 @@ impl AppError {
     /// # Examples
     ///
     /// ```rust
-    /// use claude_code_core::error::AppError;
+    /// use claude_rust_core::error::AppError;
     ///
     /// let error = AppError::ConnectionTimeout {
     ///     duration: std::time::Duration::from_secs(30),
@@ -615,7 +615,7 @@ impl fmt::Display for ErrorCategory {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_core::error::AppResult;
+/// use claude_rust_core::error::AppResult;
 ///
 /// fn do_something() -> AppResult<String> {
 ///     Ok("success".to_string())
@@ -687,7 +687,7 @@ impl From<std::string::FromUtf8Error> for AppError {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_core::error::{AppError, AppResult, ErrorContext};
+/// use claude_rust_core::error::{AppError, AppResult, ErrorContext};
 ///
 /// fn read_config() -> AppResult<String> {
 ///     std::fs::read_to_string("config.toml")

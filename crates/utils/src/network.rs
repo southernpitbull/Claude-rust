@@ -14,7 +14,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_utils::network::*;
+//! use claude_rust_utils::network::*;
 //! use std::time::Duration;
 //!
 //! #[tokio::main]
@@ -55,7 +55,7 @@ pub const DEFAULT_USER_AGENT: &str = concat!("claude-code/", env!("CARGO_PKG_VER
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::create_client;
+/// use claude_rust_utils::network::create_client;
 ///
 /// let client = create_client().unwrap();
 /// ```
@@ -68,7 +68,7 @@ pub fn create_client() -> UtilsResult<Client> {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::create_client_with_timeout;
+/// use claude_rust_utils::network::create_client_with_timeout;
 /// use std::time::Duration;
 ///
 /// let client = create_client_with_timeout(Duration::from_secs(60)).unwrap();
@@ -89,7 +89,7 @@ pub fn create_client_with_timeout(timeout_duration: Duration) -> UtilsResult<Cli
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::is_reachable;
+/// use claude_rust_utils::network::is_reachable;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -111,7 +111,7 @@ pub async fn is_reachable(url: &str) -> bool {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::with_timeout;
+/// use claude_rust_utils::network::with_timeout;
 /// use std::time::Duration;
 ///
 /// #[tokio::main]
@@ -206,7 +206,7 @@ impl RetryConfig {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::retry_with_backoff;
+/// use claude_rust_utils::network::retry_with_backoff;
 /// use std::time::Duration;
 ///
 /// #[tokio::main]
@@ -244,7 +244,7 @@ where
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::{retry_with_config, RetryConfig};
+/// use claude_rust_utils::network::{retry_with_config, RetryConfig};
 /// use std::time::Duration;
 ///
 /// #[tokio::main]
@@ -313,7 +313,7 @@ where
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::network::is_retryable_error;
+/// use claude_rust_utils::network::is_retryable_error;
 /// use reqwest::Error;
 ///
 /// // This is just a conceptual example

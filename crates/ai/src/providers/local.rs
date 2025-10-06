@@ -5,7 +5,7 @@ use crate::provider::{
 };
 use crate::request::{AIRequest, AIResponse, StopReason, StreamChunk, UsageStats};
 use async_trait::async_trait;
-use claude_code_core::types::ProviderType;
+use claude_rust_core::types::ProviderType;
 use futures::stream::Stream;
 use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};

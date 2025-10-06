@@ -17,7 +17,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_utils::formatting::*;
+//! use claude_rust_utils::formatting::*;
 //!
 //! // Truncate long text
 //! let truncated = truncate("This is a very long string", 10, "...");
@@ -40,7 +40,7 @@ use std::time::Duration;
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::truncate;
+/// use claude_rust_utils::formatting::truncate;
 ///
 /// assert_eq!(truncate("Hello, World!", 5, "..."), "He...");
 /// assert_eq!(truncate("Short", 10, "..."), "Short");
@@ -59,7 +59,7 @@ pub fn truncate(text: &str, max_length: usize, suffix: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::format_number;
+/// use claude_rust_utils::formatting::format_number;
 ///
 /// assert_eq!(format_number(1000), "1,000");
 /// assert_eq!(format_number(1234567), "1,234,567");
@@ -85,7 +85,7 @@ pub fn format_number(num: u64) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::format_file_size;
+/// use claude_rust_utils::formatting::format_file_size;
 ///
 /// assert_eq!(format_file_size(0), "0 Bytes");
 /// assert_eq!(format_file_size(1024), "1.00 KB");
@@ -113,7 +113,7 @@ pub fn format_file_size(bytes: u64) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::format_duration;
+/// use claude_rust_utils::formatting::format_duration;
 /// use std::time::Duration;
 ///
 /// assert_eq!(format_duration(Duration::from_millis(500)), "500ms");
@@ -158,7 +158,7 @@ pub fn format_duration(duration: Duration) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::pluralize;
+/// use claude_rust_utils::formatting::pluralize;
 ///
 /// assert_eq!(pluralize(1, "file", "files"), "1 file");
 /// assert_eq!(pluralize(5, "file", "files"), "5 files");
@@ -177,7 +177,7 @@ pub fn pluralize(count: usize, singular: &str, plural: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::pluralize_simple;
+/// use claude_rust_utils::formatting::pluralize_simple;
 ///
 /// assert_eq!(pluralize_simple(1, "error"), "1 error");
 /// assert_eq!(pluralize_simple(3, "error"), "3 errors");
@@ -191,7 +191,7 @@ pub fn pluralize_simple(count: usize, word: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::strip_ansi;
+/// use claude_rust_utils::formatting::strip_ansi;
 ///
 /// let colored = "\x1b[31mRed Text\x1b[0m";
 /// assert_eq!(strip_ansi(colored), "Red Text");
@@ -207,7 +207,7 @@ pub fn strip_ansi(text: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::indent;
+/// use claude_rust_utils::formatting::indent;
 ///
 /// let text = "Line 1\nLine 2";
 /// let indented = indent(text, 2);
@@ -226,7 +226,7 @@ pub fn indent(text: &str, spaces: usize) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::pad_string;
+/// use claude_rust_utils::formatting::pad_string;
 ///
 /// assert_eq!(pad_string("test", 8, ' ', true), "test    ");
 /// assert_eq!(pad_string("test", 8, ' ', false), "    test");
@@ -250,7 +250,7 @@ pub fn pad_string(text: &str, width: usize, pad_char: char, pad_right: bool) -> 
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::center_string;
+/// use claude_rust_utils::formatting::center_string;
 ///
 /// assert_eq!(center_string("Hi", 6, ' '), "  Hi  ");
 /// assert_eq!(center_string("Test", 8, '-'), "--Test--");
@@ -277,7 +277,7 @@ pub fn center_string(text: &str, width: usize, pad_char: char) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::wrap_text;
+/// use claude_rust_utils::formatting::wrap_text;
 ///
 /// let text = "This is a very long line that needs to be wrapped";
 /// let wrapped = wrap_text(text, 20);
@@ -333,7 +333,7 @@ pub fn wrap_text(text: &str, width: usize) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::snake_to_camel;
+/// use claude_rust_utils::formatting::snake_to_camel;
 ///
 /// assert_eq!(snake_to_camel("hello_world"), "helloWorld");
 /// assert_eq!(snake_to_camel("foo_bar_baz"), "fooBarBaz");
@@ -361,7 +361,7 @@ pub fn snake_to_camel(text: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::snake_to_pascal;
+/// use claude_rust_utils::formatting::snake_to_pascal;
 ///
 /// assert_eq!(snake_to_pascal("hello_world"), "HelloWorld");
 /// assert_eq!(snake_to_pascal("foo_bar"), "FooBar");
@@ -386,7 +386,7 @@ pub fn snake_to_pascal(text: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::camel_to_snake;
+/// use claude_rust_utils::formatting::camel_to_snake;
 ///
 /// assert_eq!(camel_to_snake("helloWorld"), "hello_world");
 /// assert_eq!(camel_to_snake("fooBarBaz"), "foo_bar_baz");
@@ -411,7 +411,7 @@ pub fn camel_to_snake(text: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::pascal_to_snake;
+/// use claude_rust_utils::formatting::pascal_to_snake;
 ///
 /// assert_eq!(pascal_to_snake("HelloWorld"), "hello_world");
 /// assert_eq!(pascal_to_snake("FooBar"), "foo_bar");
@@ -425,7 +425,7 @@ pub fn pascal_to_snake(text: &str) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::format_percentage;
+/// use claude_rust_utils::formatting::format_percentage;
 ///
 /// assert_eq!(format_percentage(0.5), "50.00%");
 /// assert_eq!(format_percentage(0.333), "33.30%");
@@ -439,7 +439,7 @@ pub fn format_percentage(value: f64) -> String {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::formatting::progress_bar;
+/// use claude_rust_utils::formatting::progress_bar;
 ///
 /// let bar = progress_bar(50, 100, 20, '=', '-');
 /// // Creates: [==========----------] 50%

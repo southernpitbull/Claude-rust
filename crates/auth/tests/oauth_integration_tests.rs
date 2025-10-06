@@ -3,7 +3,7 @@
 //! These tests demonstrate the usage of the OAuth flow implementation
 //! with PKCE support.
 
-use claude_code_auth::{
+use claude_rust_auth::{
     ChallengeMethod, OAuthConfig, OAuthFlow, PkceParams, CallbackServer, ServerConfig,
 };
 
@@ -155,7 +155,7 @@ fn test_server_config_customization() {
 async fn test_oauth_flow_with_mock_config() {
     // Test OAuth flow creation with realistic configuration
     let config = OAuthConfig::new(
-        "claude_code_client".to_string(),
+        "claude_rust_client".to_string(),
         "https://auth.anthropic.com/oauth/authorize".to_string(),
         "https://auth.anthropic.com/oauth/token".to_string(),
     )
@@ -170,7 +170,7 @@ async fn test_oauth_flow_with_mock_config() {
     // Generate authorization URL
     let auth_url = flow.start_flow().unwrap();
 
-    assert!(auth_url.contains("claude_code_client"));
+    assert!(auth_url.contains("claude_rust_client"));
     assert!(auth_url.contains("api.read"));
     assert!(auth_url.contains("api.write"));
 }

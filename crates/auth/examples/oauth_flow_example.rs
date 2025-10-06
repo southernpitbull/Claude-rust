@@ -5,7 +5,7 @@
 //!
 //! Run with: cargo run --example oauth_flow_example
 
-use claude_code_auth::{OAuthConfig, OAuthFlow, ServerConfig, CallbackServer};
+use claude_rust_auth::{OAuthConfig, OAuthFlow, ServerConfig, CallbackServer};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

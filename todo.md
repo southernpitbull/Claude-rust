@@ -1,4 +1,4 @@
-# Claude Code Rust - Ultra Granular TODO List
+# Claude-Rust Rust - Ultra Granular TODO List
 
 ## Progress Tracking
 
@@ -235,7 +235,7 @@
   - [x] Show commit result
 
 - [x] Implement /bug command
-  - [x] Report bugs in Claude Code
+  - [x] Report bugs in Claude-Rust
   - [x] Collect system info
   - [x] Create GitHub issue (provides URL)
 
@@ -412,7 +412,7 @@
 - [x] Implement settings saving
 
 #### 8.1.2 Project Settings
-- [x] Create .claude/settings.json (.claude-code.toml)
+- [x] Create .claude/settings.json (.claude-rust.toml)
 - [x] Load project settings
 - [x] Merge with global settings
 - [x] Override global settings
@@ -1499,7 +1499,7 @@
 
 ## Notes
 
-- Focus on MVP features first to achieve feature parity with original Claude Code
+- Focus on MVP features first to achieve feature parity with original Claude-Rust
 - Each completed item should include tests
 - Document as you build
 - Regular testing on all platforms

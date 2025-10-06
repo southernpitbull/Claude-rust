@@ -1,5 +1,5 @@
 [package]
-name = "claude-code-cli"
+name = "claude-rust-cli"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -7,20 +7,20 @@ license.workspace = true
 repository.workspace = true
 
 [[bin]]
-name = "claude-code"
+name = "claude-rust"
 path = "src/main.rs"
 
 [dependencies]
 # Workspace crates
-claude-code-core = { path = "../core" }
-claude-code-auth = { path = "../auth" }
-claude-code-ai = { path = "../ai" }
-claude-code-terminal = { path = "../terminal" }
-claude-code-utils = { path = "../utils" }
-claude-code-mcp = { path = "../mcp" }
-claude-code-hooks = { path = "../hooks" }
-claude-code-tasks = { path = "../tasks" }
-claude-code-agents = { path = "../agents" }
+claude-rust-core = { path = "../core" }
+claude-rust-auth = { path = "../auth" }
+claude-rust-ai = { path = "../ai" }
+claude-rust-terminal = { path = "../terminal" }
+claude-rust-utils = { path = "../utils" }
+claude-rust-mcp = { path = "../mcp" }
+claude-rust-hooks = { path = "../hooks" }
+claude-rust-tasks = { path = "../tasks" }
+claude-rust-agents = { path = "../agents" }
 
 # Workspace dependencies
 tokio = { workspace = true }

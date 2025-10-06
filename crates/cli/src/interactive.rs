@@ -3,11 +3,11 @@
 //! Provides an interactive REPL session with the AI assistant
 
 use anyhow::Result;
-use claude_code_ai::{AiClient, CompletionRequest, Message, MessageRole};
-use claude_code_auth::AuthManager;
-use claude_code_core::session::{Session, SessionStore};
-use claude_code_core::checkpoint::CheckpointStore;
-use claude_code_terminal::Formatter;
+use claude_rust_ai::{AiClient, CompletionRequest, Message, MessageRole};
+use claude_rust_auth::AuthManager;
+use claude_rust_core::session::{Session, SessionStore};
+use claude_rust_core::checkpoint::CheckpointStore;
+use claude_rust_terminal::Formatter;
 use rustyline::completion::{Completer, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::highlight::Highlighter;
@@ -245,7 +245,7 @@ impl InteractiveSession {
         println!("██║  ██║╚██████╔╝███████║   ██║                  ");
         println!("╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝                  ");
         println!();
-        println!("🤖 Welcome to Claude Code Interactive Mode!");
+        println!("🤖 Welcome to Claude-Rust Interactive Mode!");
         println!();
         
         // Check authentication status

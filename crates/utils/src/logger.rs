@@ -15,7 +15,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use claude_code_utils::logger::{setup_logging, LogConfig, LogFormat};
+//! use claude_rust_utils::logger::{setup_logging, LogConfig, LogFormat};
 //!
 //! // Simple setup with default configuration
 //! setup_logging("info", None, LogFormat::Pretty);
@@ -300,7 +300,7 @@ impl LogConfig {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::logger::{setup_logging, LogFormat};
+/// use claude_rust_utils::logger::{setup_logging, LogFormat};
 ///
 /// setup_logging("info", None, LogFormat::Pretty);
 /// ```
@@ -321,7 +321,7 @@ pub fn setup_logging(level: &str, log_file: Option<PathBuf>, format: LogFormat) 
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::logger::init_default;
+/// use claude_rust_utils::logger::init_default;
 ///
 /// init_default();
 /// tracing::info!("Logger initialized");
@@ -341,7 +341,7 @@ pub fn init_default() {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::logger::init_from_env;
+/// use claude_rust_utils::logger::init_from_env;
 ///
 /// // With environment variables set:
 /// // RUST_LOG=debug
@@ -386,7 +386,7 @@ pub fn init_from_env() {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::logger::parse_level;
+/// use claude_rust_utils::logger::parse_level;
 /// use tracing::Level;
 ///
 /// assert_eq!(parse_level("debug"), Some(Level::DEBUG));
@@ -410,7 +410,7 @@ pub fn parse_level(level: &str) -> Option<Level> {
 /// # Examples
 ///
 /// ```rust
-/// use claude_code_utils::logger::init_test_logger;
+/// use claude_rust_utils::logger::init_test_logger;
 ///
 /// #[test]
 /// fn test_something() {

@@ -1,6 +1,6 @@
 //! Settings Commands
 //!
-//! Provides command-line interface for managing Claude Code settings
+//! Provides command-line interface for managing Claude-Rust settings
 
 use crate::settings::SettingsManager;
 use anyhow::Result;
@@ -10,7 +10,7 @@ use std::path::Path;
 pub async fn handle_settings_show(manager: &SettingsManager) -> Result<()> {
     let settings = manager.get_settings();
     
-    println!("\n⚙️  Claude Code Settings:\n");
+    println!("\n⚙️  Claude-Rust Settings:\n");
     
     // AI Settings
     println!("🤖 AI Settings:");

@@ -6,7 +6,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, warn};
 
-use claude_code_tasks::{Task, TaskExecutor, TaskId};
+use claude_rust_tasks::{Task, TaskExecutor, TaskId};
 
 use crate::handler::AgentTaskHandler;
 use crate::registry::AgentRegistry;

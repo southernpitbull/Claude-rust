@@ -1,6 +1,6 @@
-# Contributing to Claude Code Rust
+# Contributing to Claude-Rust Rust
 
-Thank you for your interest in contributing to Claude Code Rust! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Claude-Rust Rust! This document provides guidelines and information for contributors.
 
 ## Table of Contents
 
@@ -27,12 +27,12 @@ This project adheres to a code of conduct that all contributors are expected to 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/claude-code-rust.git
-   cd claude-code-rust
+   git clone https://github.com/YOUR_USERNAME/claude-rust-rust.git
+   cd claude-rust-rust
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/anthropic/claude-code-rust.git
+   git remote add upstream https://github.com/anthropic/claude-rust-rust.git
    ```
 
 ## Development Setup
@@ -65,7 +65,7 @@ cargo build
 cargo build --release
 
 # Build a specific crate
-cargo build --package claude-code-cli
+cargo build --package claude-rust-cli
 ```
 
 ### Running Tests
@@ -75,7 +75,7 @@ cargo build --package claude-code-cli
 cargo test --all
 
 # Run tests for a specific crate
-cargo test --package claude-code-core
+cargo test --package claude-rust-core
 
 # Run tests with output
 cargo test -- --nocapture
@@ -97,7 +97,7 @@ cargo run --release -- ask "What is Rust?"
 ## Project Structure
 
 ```
-claude-code-rust/
+claude-rust-rust/
 ├── crates/
 │   ├── cli/          # Main CLI application
 │   ├── core/         # Core functionality

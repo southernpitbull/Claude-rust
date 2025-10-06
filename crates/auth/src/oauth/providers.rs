@@ -95,7 +95,7 @@ pub mod qwen_endpoints {
 /// # Example
 ///
 /// ```no_run
-/// use claude_code_auth::oauth::providers::ClaudeOAuth;
+/// use claude_rust_auth::oauth::providers::ClaudeOAuth;
 ///
 /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let oauth = ClaudeOAuth::new("client_id_here".to_string())

@@ -4,8 +4,8 @@
 //! Supports stdin piping, multiple output formats, and error handling.
 
 use anyhow::{Context, Result};
-use claude_code_ai::{AiClient, CompletionRequest, Message, MessageRole};
-use claude_code_auth::AuthManager;
+use claude_rust_ai::{AiClient, CompletionRequest, Message, MessageRole};
+use claude_rust_auth::AuthManager;
 use serde_json::json;
 use std::collections::HashMap;
 use std::io::{self, IsTerminal, Read};
@@ -100,7 +100,7 @@ impl PrintMode {
         if !self.check_auth().await? {
             if !self.config.quiet {
                 eprintln!("Error: Not authenticated");
-                eprintln!("Run 'claude-code auth login' to authenticate");
+                eprintln!("Run 'claude-rust auth login' to authenticate");
             }
             return Ok(2); // Exit code 2 for auth error
         }

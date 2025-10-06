@@ -17,9 +17,9 @@ resolver = "2"
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["Claude Code Contributors"]
+authors = ["Claude-Rust Contributors"]
 license = "MIT"
-repository = "https://github.com/anthropic/claude-code"
+repository = "https://github.com/anthropic/claude-rust"
 
 [workspace.dependencies]
 # Async Runtime

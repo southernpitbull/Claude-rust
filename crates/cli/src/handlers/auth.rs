@@ -1,8 +1,8 @@
 //! Authentication command handlers.
 
 use anyhow::{Context, Result};
-use claude_code_auth::{AuthMethod, ProviderAuthConfig};
-use claude_code_terminal::{Table, Alignment};
+use claude_rust_auth::{AuthMethod, ProviderAuthConfig};
+use claude_rust_terminal::{Table, Alignment};
 use dialoguer::{Input, Password, Confirm};
 use tracing::{debug, info};
 
@@ -285,7 +285,7 @@ async fn handle_accounts(app: &App, format: OutputFormat) -> Result<()> {
     if accounts.is_empty() {
         formatter.print_warning("No authenticated accounts found");
         println!();
-        formatter.print_info("Run 'claude-code auth login --provider <PROVIDER>' to authenticate");
+        formatter.print_info("Run 'claude-rust auth login --provider <PROVIDER>' to authenticate");
         return Ok(());
     }
 

@@ -141,7 +141,7 @@ pub struct Agent {
     /// Last activity timestamp
     pub last_active: Option<DateTime<Utc>>,
     /// Current task ID (if busy)
-    pub current_task: Option<claude_code_tasks::TaskId>,
+    pub current_task: Option<claude_rust_tasks::TaskId>,
     /// Number of completed tasks
     pub tasks_completed: u64,
     /// Number of failed tasks
@@ -168,7 +168,7 @@ impl Agent {
     }
 
     /// Mark agent as busy with a task
-    pub fn mark_busy(&mut self, task_id: claude_code_tasks::TaskId) {
+    pub fn mark_busy(&mut self, task_id: claude_rust_tasks::TaskId) {
         self.status = AgentStatus::Busy;
         self.current_task = Some(task_id);
         self.last_active = Some(Utc::now());
@@ -230,7 +230,7 @@ pub struct AgentRequest {
     /// Agent type requested
     pub agent_type: AgentType,
     /// Task to delegate
-    pub task_id: claude_code_tasks::TaskId,
+    pub task_id: claude_rust_tasks::TaskId,
     /// Required capabilities
     pub required_capabilities: Vec<String>,
     /// Request timestamp
@@ -241,7 +241,7 @@ impl AgentRequest {
     /// Create a new agent request
     pub fn new(
         agent_type: AgentType,
-        task_id: claude_code_tasks::TaskId,
+        task_id: claude_rust_tasks::TaskId,
         required_capabilities: Vec<String>,
     ) -> Self {
         Self {
@@ -260,7 +260,7 @@ pub struct AgentResult {
     /// Agent ID
     pub agent_id: AgentId,
     /// Task ID
-    pub task_id: claude_code_tasks::TaskId,
+    pub task_id: claude_rust_tasks::TaskId,
     /// Success flag
     pub success: bool,
     /// Result data
@@ -275,7 +275,7 @@ impl AgentResult {
     /// Create a successful result
     pub fn success(
         agent_id: AgentId,
-        task_id: claude_code_tasks::TaskId,
+        task_id: claude_rust_tasks::TaskId,
         data: Option<serde_json::Value>,
     ) -> Self {
         Self {
@@ -291,7 +291,7 @@ impl AgentResult {
     /// Create a failed result
     pub fn failure(
         agent_id: AgentId,
-        task_id: claude_code_tasks::TaskId,
+        task_id: claude_rust_tasks::TaskId,
         error: String,
     ) -> Self {
         Self {

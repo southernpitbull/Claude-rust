@@ -1,11 +1,11 @@
 //! Built-in Tools
 //!
-//! Standard tools provided by Claude Code
+//! Standard tools provided by Claude-Rust
 
 use crate::registry::ToolRegistry;
 use crate::tool::{Tool, ToolCategory, ToolDefinition, ToolParameter, ToolParameterType};
 use async_trait::async_trait;
-use claude_code_core::{FileOps, CommandExecutor, CommandOptions};
+use claude_rust_core::{FileOps, CommandExecutor, CommandOptions};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;

@@ -1,6 +1,6 @@
 //! Tool System
 //!
-//! Provides tool registry and execution system for Claude Code
+//! Provides tool registry and execution system for Claude-Rust
 
 pub mod registry;
 pub mod tool;

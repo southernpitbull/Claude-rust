@@ -3,9 +3,11 @@
 //! Handles initial setup, provider selection, and multi-provider authentication
 
 use anyhow::Result;
-use claude_code_auth::{AuthManager, CredentialStore};
-use claude_code_core::types::ProviderType;
+use claude_rust_auth::{AuthManager, CredentialStore};
+use claude_rust_core::types::ProviderType;
+use claude_rust_core::config::ConfigLoader;
 use std::io::{self, Write};
+use std::fs;
 use tracing::{info, warn};
 
 /// Check if this is the first run (no authenticated providers)
@@ -26,7 +28,7 @@ pub async fn is_first_run() -> Result<bool> {
 
 /// Run the first-time setup wizard
 pub async fn run_first_time_setup() -> Result<()> {
-    println!("\n🎉 Welcome to Claude Code Rust!\n");
+    println!("\n🎉 Welcome to Claude-Rust Rust!\n");
     println!("Let's get you set up with AI providers.\n");
 
     // Show available providers
@@ -68,20 +70,68 @@ pub async fn run_first_time_setup() -> Result<()> {
 
     println!();
 
+    // Track successfully configured providers
+    let mut configured_providers = Vec::new();
+
     // Set up each provider
-    for provider in providers_to_setup {
-        if let Err(e) = setup_provider(provider).await {
+    for provider in &providers_to_setup {
+        if let Err(e) = setup_provider(*provider).await {
             warn!("Failed to set up {}: {}", provider, e);
             println!("⚠️  Failed to set up {}. You can set it up later with:", provider);
-            println!("   claude-code auth login {}\n", provider.to_string().to_lowercase());
+            println!("   claude-rust auth login {}\n", provider.to_string().to_lowercase());
+        } else {
+            configured_providers.push(*provider);
         }
     }
 
-    println!("\n✅ Setup complete! You're ready to use Claude Code.");
+    // If multiple providers configured, ask which should be default
+    if configured_providers.len() > 1 {
+        println!("\n📌 You've set up multiple providers!");
+        println!("Which one would you like to use as the default?\n");
+
+        for (i, provider) in configured_providers.iter().enumerate() {
+            println!("  {}. {}", i + 1, provider);
+        }
+
+        print!("\nYour choice [1-{}]: ", configured_providers.len());
+        io::stdout().flush()?;
+
+        let mut choice = String::new();
+        io::stdin().read_line(&mut choice)?;
+
+        if let Ok(idx) = choice.trim().parse::<usize>() {
+            if idx > 0 && idx <= configured_providers.len() {
+                let default_provider = configured_providers[idx - 1];
+                if let Err(e) = set_default_provider(default_provider).await {
+                    warn!("Failed to set default provider: {}", e);
+                    println!("⚠️  Could not set default provider. You can set it later with:");
+                    println!("   claude-code config set provider.default {}", default_provider.to_string().to_lowercase());
+                } else {
+                    println!("\n✅ {} set as default provider!", default_provider);
+                }
+            } else {
+                println!("\n⚠️  Invalid choice. Using {} as default.", configured_providers[0]);
+                let _ = set_default_provider(configured_providers[0]).await;
+            }
+        } else {
+            println!("\n⚠️  Invalid input. Using {} as default.", configured_providers[0]);
+            let _ = set_default_provider(configured_providers[0]).await;
+        }
+    } else if configured_providers.len() == 1 {
+        // Only one provider - set it as default automatically
+        let default_provider = configured_providers[0];
+        if let Err(e) = set_default_provider(default_provider).await {
+            warn!("Failed to set default provider: {}", e);
+        } else {
+            println!("\n✅ {} set as your default provider!", default_provider);
+        }
+    }
+
+    println!("\n✅ Setup complete! You're ready to use Claude-Rust.");
     println!("\nQuick start:");
     println!("  claude-code ask \"What is Rust?\"");
     println!("  claude-code chat");
-    println!("  claude-code --help\n");
+    println!("  claude-rust --help\n");
 
     Ok(())
 }
@@ -198,7 +248,7 @@ async fn setup_api_key(provider: ProviderType) -> Result<()> {
 async fn setup_oauth(provider: ProviderType) -> Result<()> {
     println!("\n   Starting OAuth flow for {}...", provider);
     println!("   A browser window will open for authentication.");
-    println!("   Follow the prompts to authorize Claude Code.");
+    println!("   Follow the prompts to authorize Claude-Rust.");
 
     // TODO: Implement OAuth flow
     // For now, this is a placeholder
@@ -217,6 +267,64 @@ fn get_api_key_url(provider: ProviderType) -> &'static str {
         ProviderType::Qwen => "https://dashscope.console.aliyun.com/apiKey",
         ProviderType::Ollama => "http://localhost:11434 (local installation)",
         ProviderType::LMStudio => "http://localhost:1234 (local installation)",
+    }
+}
+
+/// Set the default provider in the configuration
+async fn set_default_provider(provider: ProviderType) -> Result<()> {
+    // Load current configuration
+    let loader = ConfigLoader::new();
+    let mut config = loader.load()?;
+
+    // Set the default provider
+    let provider_name = provider.to_string().to_lowercase();
+    config.providers.default_provider = Some(provider_name.clone());
+
+    info!("Setting default provider to: {}", provider_name);
+
+    // Save the updated configuration
+    let config_dir = if cfg!(target_os = "windows") {
+        dirs::config_dir()
+            .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?
+            .join("claude-code")
+    } else {
+        dirs::home_dir()
+            .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?
+            .join(".config")
+            .join("claude-code")
+    };
+
+    // Create config directory if it doesn't exist
+    fs::create_dir_all(&config_dir)?;
+
+    let config_path = config_dir.join("config.toml");
+
+    // Serialize and save configuration
+    let toml_content = toml::to_string_pretty(&config)?;
+    fs::write(&config_path, toml_content)?;
+
+    info!("Saved default provider configuration to {}", config_path.display());
+
+    Ok(())
+}
+
+// Use dirs crate for cross-platform directory detection
+mod dirs {
+    use std::path::PathBuf;
+
+    pub fn home_dir() -> Option<PathBuf> {
+        std::env::var("HOME")
+            .or_else(|_| std::env::var("USERPROFILE"))
+            .ok()
+            .map(PathBuf::from)
+    }
+
+    pub fn config_dir() -> Option<PathBuf> {
+        if cfg!(target_os = "windows") {
+            std::env::var("APPDATA").ok().map(PathBuf::from)
+        } else {
+            home_dir().map(|h| h.join(".config"))
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 # OAuth 2.0 Implementation with PKCE Support
 
-This document describes the OAuth 2.0 authorization code flow implementation with Proof Key for Code Exchange (PKCE) support in the `claude-code-auth` crate.
+This document describes the OAuth 2.0 authorization code flow implementation with Proof Key for Code Exchange (PKCE) support in the `claude-rust-auth` crate.
 
 ## Overview
 
@@ -331,19 +331,19 @@ match flow.run_flow().await {
 All modules include comprehensive unit tests:
 
 ```bash
-cargo test --package claude-code-auth
+cargo test --package claude-rust-auth
 ```
 
 ### Integration Tests
 
 ```bash
-cargo test --package claude-code-auth --test oauth_integration_tests
+cargo test --package claude-rust-auth --test oauth_integration_tests
 ```
 
 ### Examples
 
 ```bash
-cargo run --package claude-code-auth --example oauth_flow_example
+cargo run --package claude-rust-auth --example oauth_flow_example
 ```
 
 ## RFC Compliance
