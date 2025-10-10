@@ -444,7 +444,7 @@ See [todo.md](todo.md) for detailed progress tracking.
 - [ ] Task notifications
 - [ ] Plugin system
 - [ ] Web UI dashboard
-- [ ] Docker support
+- [x] Docker support (Recently added - see Dockerfile and docker-compose.yml)
 - [ ] Package manager integration (cargo, npm, apt, etc.)
 
 ## Contributing
