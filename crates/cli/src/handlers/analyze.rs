@@ -1,7 +1,7 @@
 //! Code analysis and search handlers.
 
 use anyhow::{Context, Result};
-use claude_rust_terminal::{Table, Alignment, StatusIndicator};
+use claude_code_terminal::{Table, Alignment, StatusIndicator};
 use indicatif::{ProgressBar, ProgressStyle};
 use std::path::PathBuf;
 use tracing::{debug, info};

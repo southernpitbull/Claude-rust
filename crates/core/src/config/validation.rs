@@ -3,7 +3,7 @@
 // Validates configuration values to ensure they are sensible and secure
 
 use super::Config;
-use crate::error::{AppError, AppResult, ErrorCategory};
+use crate::error::{AppError, AppResult};
 use tracing::warn;
 
 /// Configuration validator

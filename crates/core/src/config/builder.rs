@@ -215,19 +215,17 @@ impl ConfigBuilder {
 
         // Load from file if not skipped
         if !self.skip_files {
-            let loader = if let Some(config_file) = self.config_file {
+            if let Some(config_file) = self.config_file {
                 // Load from specific file
                 let file_config = ConfigLoader::new().load_from_file(&config_file)?;
                 self.config = Self::merge_configs(file_config, self.config);
-                ConfigLoader::new()
             } else {
                 // Load from default locations
                 let loader = ConfigLoader::new().with_env_prefix(self.env_prefix.clone());
                 if let Ok(file_config) = loader.load() {
                     self.config = Self::merge_configs(file_config, self.config);
                 }
-                loader
-            };
+            }
         }
 
         // Apply environment variables if not skipped

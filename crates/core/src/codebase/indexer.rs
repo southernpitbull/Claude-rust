@@ -69,77 +69,22 @@ pub struct IndexEntry {
     pub content_hash: String,
 }
 
-/// Codebase index version for compatibility tracking
-pub const INDEX_VERSION: u32 = 1;
-
 /// Codebase index
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct CodebaseIndex {
-    /// Index format version
-    #[serde(default = "default_version")]
-    version: u32,
-
     /// Index entries by file path
     entries: HashMap<PathBuf, IndexEntry>,
-
     /// Symbol name to locations mapping
     symbol_index: HashMap<String, Vec<Symbol>>,
-
-    /// Timestamp when index was created
-    #[serde(default = "chrono::Utc::now")]
-    created_at: chrono::DateTime<chrono::Utc>,
-
-    /// Timestamp when index was last updated
-    #[serde(default = "chrono::Utc::now")]
-    updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-fn default_version() -> u32 {
-    INDEX_VERSION
-}
-
-impl Default for CodebaseIndex {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl CodebaseIndex {
     /// Create a new empty index
     pub fn new() -> Self {
-        let now = chrono::Utc::now();
         Self {
-            version: INDEX_VERSION,
             entries: HashMap::new(),
             symbol_index: HashMap::new(),
-            created_at: now,
-            updated_at: now,
         }
-    }
-
-    /// Get the index version
-    pub fn version(&self) -> u32 {
-        self.version
-    }
-
-    /// Check if index version is compatible
-    pub fn is_compatible(&self) -> bool {
-        self.version == INDEX_VERSION
-    }
-
-    /// Get creation timestamp
-    pub fn created_at(&self) -> chrono::DateTime<chrono::Utc> {
-        self.created_at
-    }
-
-    /// Get last update timestamp
-    pub fn updated_at(&self) -> chrono::DateTime<chrono::Utc> {
-        self.updated_at
-    }
-
-    /// Mark index as updated
-    fn mark_updated(&mut self) {
-        self.updated_at = chrono::Utc::now();
     }
 
     /// Index a file
@@ -210,7 +155,6 @@ impl CodebaseIndex {
                 .push(symbol);
         }
 
-        self.mark_updated();
         info!("Successfully indexed file: {:?}", path);
         Ok(())
     }
@@ -232,29 +176,7 @@ impl CodebaseIndex {
 
     /// Find symbols by name pattern
     pub fn find_symbols_pattern(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
-        self.find_symbols_pattern_with_options(pattern, true, false)
-    }
-
-    /// Find symbols by name pattern with search options
-    pub fn find_symbols_pattern_with_options(
-        &self,
-        pattern: &str,
-        case_sensitive: bool,
-        whole_word: bool,
-    ) -> AppResult<Vec<&Symbol>> {
-        // Build regex pattern with options
-        let mut regex_pattern = if whole_word {
-            format!(r"\b{}\b", regex::escape(pattern))
-        } else {
-            pattern.to_string()
-        };
-
-        // Add case-insensitive flag if needed
-        if !case_sensitive {
-            regex_pattern = format!("(?i){}", regex_pattern);
-        }
-
-        let regex = Regex::new(&regex_pattern)
+        let regex = Regex::new(pattern)
             .map_err(|e| AppError::validation_error(format!("Invalid regex pattern: {}", e)))?;
 
         let mut results = Vec::new();
@@ -265,21 +187,6 @@ impl CodebaseIndex {
         }
 
         Ok(results)
-    }
-
-    /// Find symbols with case-sensitive search
-    pub fn find_symbols_case_sensitive(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
-        self.find_symbols_pattern_with_options(pattern, true, false)
-    }
-
-    /// Find symbols with case-insensitive search
-    pub fn find_symbols_case_insensitive(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
-        self.find_symbols_pattern_with_options(pattern, false, false)
-    }
-
-    /// Find symbols matching whole word only
-    pub fn find_symbols_whole_word(&self, pattern: &str) -> AppResult<Vec<&Symbol>> {
-        self.find_symbols_pattern_with_options(pattern, true, true)
     }
 
     /// Find symbols by kind
@@ -315,115 +222,6 @@ impl CodebaseIndex {
     pub fn clear(&mut self) {
         self.entries.clear();
         self.symbol_index.clear();
-        self.mark_updated();
-    }
-
-    /// Validate index integrity
-    pub fn validate_integrity(&self) -> AppResult<()> {
-        // Check version compatibility
-        if !self.is_compatible() {
-            return Err(AppError::validation_error(format!(
-                "Incompatible index version: {} (expected {})",
-                self.version, INDEX_VERSION
-            )));
-        }
-
-        // Validate that all symbols in symbol_index reference existing entries
-        for (name, symbols) in &self.symbol_index {
-            for symbol in symbols {
-                if !self.entries.contains_key(&symbol.file) {
-                    return Err(AppError::validation_error(format!(
-                        "Symbol '{}' references non-existent file: {:?}",
-                        name, symbol.file
-                    )));
-                }
-
-                // Verify symbol exists in the file's entry
-                if let Some(entry) = self.entries.get(&symbol.file) {
-                    if !entry.symbols.iter().any(|s| s.name == *name) {
-                        return Err(AppError::validation_error(format!(
-                            "Symbol '{}' not found in file entry for: {:?}",
-                            name, symbol.file
-                        )));
-                    }
-                }
-            }
-        }
-
-        // Validate that all entry symbols are in symbol_index
-        for (path, entry) in &self.entries {
-            for symbol in &entry.symbols {
-                if let Some(indexed_symbols) = self.symbol_index.get(&symbol.name) {
-                    if !indexed_symbols.iter().any(|s| s.file == *path) {
-                        return Err(AppError::validation_error(format!(
-                            "Entry symbol '{}' from {:?} not in symbol index",
-                            symbol.name, path
-                        )));
-                    }
-                } else {
-                    return Err(AppError::validation_error(format!(
-                        "Entry symbol '{}' from {:?} missing from symbol index",
-                        symbol.name, path
-                    )));
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Remove entries for files that no longer exist
-    pub async fn cleanup_stale_entries(&mut self) -> AppResult<usize> {
-        let mut removed_count = 0;
-        let mut paths_to_remove = Vec::new();
-
-        // Find files that no longer exist
-        for path in self.entries.keys() {
-            if !path.exists() {
-                paths_to_remove.push(path.clone());
-            }
-        }
-
-        // Remove stale entries
-        for path in &paths_to_remove {
-            if let Some(entry) = self.entries.remove(path) {
-                // Remove symbols from symbol index
-                for symbol in &entry.symbols {
-                    if let Some(locations) = self.symbol_index.get_mut(&symbol.name) {
-                        locations.retain(|s| &s.file != path);
-                        // Remove empty symbol entries
-                        if locations.is_empty() {
-                            self.symbol_index.remove(&symbol.name);
-                        }
-                    }
-                }
-                removed_count += 1;
-            }
-        }
-
-        if removed_count > 0 {
-            self.mark_updated();
-            info!("Cleaned up {} stale index entries", removed_count);
-        }
-
-        Ok(removed_count)
-    }
-
-    /// Rebuild the symbol index from entries
-    pub fn rebuild_symbol_index(&mut self) {
-        self.symbol_index.clear();
-
-        for entry in self.entries.values() {
-            for symbol in &entry.symbols {
-                self.symbol_index
-                    .entry(symbol.name.clone())
-                    .or_insert_with(Vec::new)
-                    .push(symbol.clone());
-            }
-        }
-
-        self.mark_updated();
-        info!("Rebuilt symbol index with {} symbols", self.symbol_count());
     }
 
     /// Serialize index to JSON
@@ -900,157 +698,5 @@ pub struct Struct1 {}
 
         assert_eq!(hash1, hash2);
         assert_ne!(hash1, hash3);
-    }
-
-    #[tokio::test]
-    async fn test_case_sensitive_search() {
-        let content = r#"
-pub fn TestFunc() {}
-pub fn testfunc() {}
-pub fn TESTFUNC() {}
-"#;
-
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file_path).await.unwrap();
-
-        // Case-sensitive search should find exact match only
-        let results = index.find_symbols_case_sensitive("TestFunc").unwrap();
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].name, "TestFunc");
-
-        // Case-insensitive search should find all variations
-        let results = index.find_symbols_case_insensitive("testfunc").unwrap();
-        assert_eq!(results.len(), 3);
-    }
-
-    #[tokio::test]
-    async fn test_whole_word_search() {
-        let content = r#"
-pub fn test() {}
-pub fn testing() {}
-pub fn test_func() {}
-pub fn my_test_func() {}
-"#;
-
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file_path).await.unwrap();
-
-        // Whole word search should only match exact word boundaries
-        let results = index.find_symbols_whole_word("test").unwrap();
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].name, "test");
-
-        // Pattern search without whole word should match partial
-        let results = index.find_symbols_pattern("test").unwrap();
-        assert!(results.len() >= 1);
-    }
-
-    #[tokio::test]
-    async fn test_combined_search_options() {
-        let content = r#"
-pub fn Test() {}
-pub fn test() {}
-pub fn Testing() {}
-"#;
-
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file_path).await.unwrap();
-
-        // Case-insensitive + whole word
-        let results = index
-            .find_symbols_pattern_with_options("test", false, true)
-            .unwrap();
-        assert_eq!(results.len(), 2); // Test and test, but not Testing
-    }
-
-    #[tokio::test]
-    async fn test_index_versioning() {
-        let content = "pub fn test() {}";
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-
-        let mut index = CodebaseIndex::new();
-        assert_eq!(index.version(), INDEX_VERSION);
-        assert!(index.is_compatible());
-
-        index.index_file(&file_path).await.unwrap();
-
-        // Timestamps should be set
-        assert!(index.created_at() <= chrono::Utc::now());
-        assert!(index.updated_at() <= chrono::Utc::now());
-        assert!(index.created_at() <= index.updated_at());
-    }
-
-    #[tokio::test]
-    async fn test_integrity_validation() {
-        let content = "pub fn test() {}";
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file_path).await.unwrap();
-
-        // Should be valid
-        assert!(index.validate_integrity().is_ok());
-
-        // Manually corrupt by removing entry but keeping symbol
-        index.entries.clear();
-
-        // Should now be invalid
-        assert!(index.validate_integrity().is_err());
-    }
-
-    #[tokio::test]
-    async fn test_cleanup_stale_entries() {
-        let temp_dir = TempDir::new().unwrap();
-        let file1 = temp_dir.path().join("file1.rs");
-        let file2 = temp_dir.path().join("file2.rs");
-
-        fs::write(&file1, "pub fn func1() {}").await.unwrap();
-        fs::write(&file2, "pub fn func2() {}").await.unwrap();
-
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file1).await.unwrap();
-        index.index_file(&file2).await.unwrap();
-
-        assert_eq!(index.file_count(), 2);
-
-        // Remove one file
-        fs::remove_file(&file1).await.unwrap();
-
-        // Cleanup should remove 1 entry
-        let removed = index.cleanup_stale_entries().await.unwrap();
-        assert_eq!(removed, 1);
-        assert_eq!(index.file_count(), 1);
-
-        // Validate integrity after cleanup
-        assert!(index.validate_integrity().is_ok());
-    }
-
-    #[tokio::test]
-    async fn test_rebuild_symbol_index() {
-        let content = r#"
-pub fn func1() {}
-pub fn func2() {}
-"#;
-
-        let (_temp_dir, file_path) = setup_test_file(content, "rs").await;
-        let mut index = CodebaseIndex::new();
-        index.index_file(&file_path).await.unwrap();
-
-        let original_count = index.symbol_count();
-        assert!(original_count >= 2);
-
-        // Corrupt symbol index
-        index.symbol_index.clear();
-        assert_eq!(index.symbol_count(), 0);
-
-        // Rebuild
-        index.rebuild_symbol_index();
-        assert_eq!(index.symbol_count(), original_count);
-
-        // Should be valid again
-        assert!(index.validate_integrity().is_ok());
     }
 }

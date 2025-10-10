@@ -17,8 +17,8 @@ pub use providers::{
 pub use rate_limiter::{RateLimitConfig, RateLimiter};
 pub use task_classifier::{TaskClassification, TaskClassifier};
 pub use types::{
-    CompletionRequest, CompletionResponse, Message, MessageRole, StreamChunk, Usage,
+    CompletionRequest, CompletionResponse, Message, MessageRole, StopReason, StreamChunk, Usage,
 };
 
 // Re-export ProviderType from core
-pub use claude_rust_core::types::ProviderType;
+pub use claude_code_core::types::ProviderType;

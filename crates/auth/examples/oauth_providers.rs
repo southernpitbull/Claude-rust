@@ -8,7 +8,7 @@
 //! cargo run --example oauth_providers --features="auth"
 //! ```
 
-use claude_rust_auth::{ClaudeOAuth, GeminiOAuth, OpenAIOAuth, QwenOAuth};
+use claude_code_auth::{ClaudeOAuth, GeminiOAuth, OpenAIOAuth, QwenOAuth};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

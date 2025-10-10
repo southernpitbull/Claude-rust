@@ -4,7 +4,7 @@
 
 use crate::error::{TerminalError, TerminalResult};
 use dialoguer::{
-    theme::{ColorfulTheme, SimpleTheme, Theme},
+    theme::{ColorfulTheme, SimpleTheme},
     Confirm, Editor, Input, MultiSelect, Password, Select,
 };
 use std::fmt::Display;

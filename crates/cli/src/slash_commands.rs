@@ -26,17 +26,19 @@ pub trait SlashCommand: Send + Sync {
 
 /// Context passed to commands during execution
 pub struct CommandContext {
-    /// Conversation history
-    pub history: Vec<claude_rust_ai::Message>,
+    /// Conversation history (limited to prevent memory issues)
+    /// Note: For very long conversations, consider using checkpoints
+    /// or implementing a sliding window to limit memory usage
+    pub history: Vec<claude_code_ai::Message>,
 
     /// Current model being used
     pub model: String,
 
     /// Session store for persistence
-    pub session_store: Option<std::sync::Arc<claude_rust_core::session::SessionStore>>,
+    pub session_store: Option<std::sync::Arc<claude_code_core::session::SessionStore>>,
 
     /// Checkpoint store for time travel
-    pub checkpoint_store: Option<std::sync::Arc<claude_rust_core::checkpoint::CheckpointStore>>,
+    pub checkpoint_store: Option<std::sync::Arc<claude_code_core::checkpoint::CheckpointStore>>,
 
     /// Current session ID
     pub session_id: Option<String>,
@@ -47,6 +49,30 @@ pub struct CommandContext {
     /// Additional metadata
     pub metadata: HashMap<String, String>,
 }
+
+/// Maximum conversation history to keep in memory (prevents OOM)
+pub const MAX_HISTORY_IN_MEMORY: usize = 1000;
+
+impl CommandContext {
+    /// Add a message to history with automatic truncation
+    pub fn add_message(&mut self, message: claude_code_ai::Message) {
+        self.history.push(message);
+        
+        // Truncate if exceeds limit, keeping most recent messages
+        if self.history.len() > MAX_HISTORY_IN_MEMORY {
+            let remove_count = self.history.len() - MAX_HISTORY_IN_MEMORY;
+            self.history.drain(0..remove_count);
+            debug!("Truncated {} old messages from history", remove_count);
+        }
+    }
+    
+    /// Get recent history up to a limit
+    pub fn recent_history(&self, limit: usize) -> &[claude_code_ai::Message] {
+        let start = self.history.len().saturating_sub(limit);
+        &self.history[start..]
+    }
+}
+
 
 /// Result of command execution
 pub enum CommandResult {
@@ -206,7 +232,7 @@ impl SlashCommand for HelpCommand {
 
         help_text.push_str("  Git Workflow:\n");
         help_text.push_str("    /commit [msg]      - Create git commit with AI message\n");
-        help_text.push_str("    /bug [desc]        - Report a bug in Claude-Rust\n");
+        help_text.push_str("    /bug [desc]        - Report a bug in Claude Code\n");
         help_text.push_str("\n");
 
         help_text.push_str("  Session Control:\n");
@@ -310,9 +336,9 @@ impl SlashCommand for HistoryCommand {
 
         for (i, msg) in context.history.iter().enumerate() {
             let role = match msg.role {
-                claude_rust_ai::MessageRole::System => "System",
-                claude_rust_ai::MessageRole::User => "User",
-                claude_rust_ai::MessageRole::Assistant => "Assistant",
+                claude_code_ai::MessageRole::System => "System",
+                claude_code_ai::MessageRole::User => "User",
+                claude_code_ai::MessageRole::Assistant => "Assistant",
             };
 
             output.push_str(&format!("{}. {} ({}): {}\n",
@@ -356,7 +382,7 @@ impl SlashCommand for SaveCommand {
             args.to_string()
         };
 
-        let session = claude_rust_core::session::Session::new(
+        let session = claude_code_core::session::Session::new(
             context.model.clone(),
             "".to_string(), // provider
         );
@@ -401,7 +427,7 @@ impl SlashCommand for LoadCommand {
         let content = fs::read_to_string(args)
             .context(format!("Failed to read {}", args))?;
 
-        let loaded_history: Vec<claude_rust_ai::Message> = serde_json::from_str(&content)
+        let loaded_history: Vec<claude_code_ai::Message> = serde_json::from_str(&content)
             .context("Failed to parse conversation file")?;
 
         context.history = loaded_history;
@@ -804,7 +830,7 @@ impl SlashCommand for RewindCommand {
                                     // Convert JSON values back to Messages
                                     context.history.clear();
                                     for value in conversation {
-                                        if let Ok(msg) = serde_json::from_value::<claude_rust_ai::Message>(value) {
+                                        if let Ok(msg) = serde_json::from_value::<claude_code_ai::Message>(value) {
                                             context.history.push(msg);
                                         }
                                     }
@@ -842,7 +868,7 @@ impl SlashCommand for RewindCommand {
                                 if let Some(conversation) = restored.conversation {
                                     context.history.clear();
                                     for value in conversation {
-                                        if let Ok(msg) = serde_json::from_value::<claude_rust_ai::Message>(value) {
+                                        if let Ok(msg) = serde_json::from_value::<claude_code_ai::Message>(value) {
                                             context.history.push(msg);
                                         }
                                     }
@@ -880,7 +906,7 @@ impl SlashCommand for RewindCommand {
                         if let Some(conversation) = restored.conversation {
                             context.history.clear();
                             for value in conversation {
-                                if let Ok(msg) = serde_json::from_value::<claude_rust_ai::Message>(value) {
+                                if let Ok(msg) = serde_json::from_value::<claude_code_ai::Message>(value) {
                                     context.history.push(msg);
                                 }
                             }
@@ -1196,7 +1222,7 @@ impl SlashCommand for CommitCommand {
              - Implement built-in commands (/help, /quit, /clear, etc.)\n\
              - Add custom command loader for .claude/commands\n\
              - Support user and project-specific commands\n\n\
-             🤖 Generated with Claude-Rust\n\
+             🤖 Generated with Claude Code\n\
              Co-Authored-By: Claude <noreply@anthropic.com>"
         } else {
             args
@@ -1217,7 +1243,7 @@ impl SlashCommand for CommitCommand {
     }
 }
 
-/// Bug command - report bugs in Claude-Rust
+/// Bug command - report bugs in Claude Code
 struct BugCommand;
 
 impl SlashCommand for BugCommand {
@@ -1226,7 +1252,7 @@ impl SlashCommand for BugCommand {
     }
 
     fn description(&self) -> &str {
-        "Report a bug in Claude-Rust"
+        "Report a bug in Claude Code"
     }
 
     fn usage(&self) -> &str {

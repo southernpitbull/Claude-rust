@@ -4,8 +4,8 @@ use anyhow::Result;
 use async_trait::async_trait;
 use tracing::{debug, info};
 
-use claude_rust_tasks::executor::TaskHandler;
-use claude_rust_tasks::{Task, TaskResult};
+use claude_code_tasks::executor::TaskHandler;
+use claude_code_tasks::{Task, TaskResult};
 
 use crate::types::{Agent, AgentType};
 

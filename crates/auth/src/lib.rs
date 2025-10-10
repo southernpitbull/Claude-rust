@@ -5,6 +5,7 @@ pub mod error;
 pub mod manager;
 pub mod multi_provider_manager;
 pub mod oauth;
+pub mod oauth_credential_loader;
 pub mod oauth_manager;
 pub mod provider;
 pub mod storage;
@@ -22,6 +23,7 @@ pub use oauth::{
     CallbackServer, ChallengeMethod, ClaudeOAuth, GeminiOAuth, OAuthConfig, OAuthFlow,
     OpenAIOAuth, PkceParams, QwenOAuth, ServerConfig, TokenResponse,
 };
+pub use oauth_credential_loader::{OAuthCredentialFileLoader, CredentialsFileSchema, OauthCredsFileSchema};
 pub use oauth_manager::OAuthManager;
 pub use provider::{ProviderAuthConfig, ProviderRegistry};
 pub use storage::{CredentialStore, TokenInfo};

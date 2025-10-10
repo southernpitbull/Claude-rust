@@ -11,5 +11,5 @@ pub enum TerminalError {
     Terminal(String),
 
     #[error("Core error: {0}")]
-    Core(#[from] claude_rust_core::AppError),
+    Core(#[from] claude_code_core::AppError),
 }

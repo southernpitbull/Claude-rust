@@ -10,7 +10,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::error::{AppError, AppResult};
 
 // ============================================================================
 // Enums

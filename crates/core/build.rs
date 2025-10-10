@@ -4,10 +4,6 @@ use std::path::PathBuf;
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
 
-    // Get cargo registry directory
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-
     // Find tree-sitter parser sources in cargo registry
     let home = std::env::var("CARGO_HOME")
         .or_else(|_| std::env::var("USERPROFILE").map(|p| format!("{}/.cargo", p)))

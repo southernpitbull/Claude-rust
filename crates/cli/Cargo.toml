@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-cli"
+name = "claude-code-cli"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -7,20 +7,22 @@ license.workspace = true
 repository.workspace = true
 
 [[bin]]
-name = "claude-rust"
+name = "claude-code"
 path = "src/main.rs"
 
 [dependencies]
 # Workspace crates
-claude-rust-core = { path = "../core" }
-claude-rust-auth = { path = "../auth" }
-claude-rust-ai = { path = "../ai" }
-claude-rust-terminal = { path = "../terminal" }
-claude-rust-utils = { path = "../utils" }
-claude-rust-mcp = { path = "../mcp" }
-claude-rust-hooks = { path = "../hooks" }
-claude-rust-tasks = { path = "../tasks" }
-claude-rust-agents = { path = "../agents" }
+claude-code-core = { path = "../core" }
+claude-code-auth = { path = "../auth" }
+claude-code-ai = { path = "../ai" }
+claude-code-terminal = { path = "../terminal" }
+claude-code-utils = { path = "../utils" }
+claude-code-mcp = { path = "../mcp" }
+claude-code-hooks = { path = "../hooks" }
+claude-code-tasks = { path = "../tasks" }
+claude-code-agents = { path = "../agents" }
+claude-code-tools = { path = "../tools" }
+claude_code_web = { path = "../web", optional = true }
 
 # Workspace dependencies
 tokio = { workspace = true }
@@ -45,3 +47,6 @@ rustyline = "14.0"
 dirs = "5.0"
 ctrlc = "3.4"
 walkdir = { workspace = true }
+regex = "1.10"
+futures = "0.3"
+async-trait = "0.1"

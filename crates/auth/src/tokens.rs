@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 /// Authentication token
@@ -15,32 +15,6 @@ pub struct AuthToken {
 }
 
 impl AuthToken {
-    /// Create a new token from an API key (never expires)
-    pub fn new_api_key(api_key: String) -> Self {
-        Self {
-            access_token: api_key,
-            refresh_token: None,
-            expires_at: i64::MAX, // Never expires
-            token_type: "api_key".to_string(),
-            scope: "all".to_string(),
-        }
-    }
-
-    /// Create a new OAuth token
-    pub fn new_oauth(
-        access_token: String,
-        refresh_token: Option<String>,
-        expires_in: i64,
-    ) -> Self {
-        Self {
-            access_token,
-            refresh_token,
-            expires_at: Utc::now().timestamp() + expires_in,
-            token_type: "Bearer".to_string(),
-            scope: "all".to_string(),
-        }
-    }
-
     /// Check if the token is expired
     pub fn is_expired(&self) -> bool {
         let now = Utc::now().timestamp();

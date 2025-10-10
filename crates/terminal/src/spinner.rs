@@ -2,7 +2,7 @@
 ///
 /// Provides functions for creating and managing spinners and progress bars.
 
-use indicatif::{MultiProgress, ProgressBar, ProgressDrawTarget, ProgressStyle};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::time::Duration;
 
 /// Terminal spinner for showing progress

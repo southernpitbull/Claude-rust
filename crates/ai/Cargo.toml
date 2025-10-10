@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-ai"
+name = "claude-code-ai"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,9 +8,9 @@ repository.workspace = true
 
 [dependencies]
 # Workspace crates
-claude-rust-core = { path = "../core" }
-claude-rust-auth = { path = "../auth" }
-claude-rust-utils = { path = "../utils" }
+claude-code-core = { path = "../core" }
+claude-code-auth = { path = "../auth" }
+claude-code-utils = { path = "../utils" }
 
 # Workspace dependencies
 tokio = { workspace = true }
@@ -30,6 +30,8 @@ async-stream = "0.3"
 
 # Other dependencies
 regex = "1.0"
+async-channel = "2.3"
+tokio-stream = "0.1"
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }

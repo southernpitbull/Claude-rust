@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime};
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// GitHub repository for updates
-pub const REPO: &str = "anthropic/claude-rust-rust";
+pub const REPO: &str = "anthropic/claude-code-rust";
 
 /// Version information
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,7 +106,7 @@ pub async fn fetch_latest_version() -> Result<VersionInfo, Box<dyn std::error::E
     let url = format!("https://api.github.com/repos/{}/releases/latest", REPO);
 
     let client = reqwest::Client::builder()
-        .user_agent("claude-rust-rust")
+        .user_agent("claude-code-rust")
         .timeout(Duration::from_secs(5))
         .build()?;
 

@@ -19,9 +19,9 @@ pub use error::{AppError, AppResult, ErrorCategory, ErrorContext};
 pub use circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState};
 
 // Re-export codebase analysis types
-pub use codebase::{AnalysisResult, CodeAnalyzer, CodeFile, CodebaseError, CodebaseResult,
-                   CodebaseScanner, CodebaseStatistics, Dependency, DependencyKind, Function,
-                   ScannerConfig, Symbol, SymbolKind, Class, CodeMetrics, CodebaseIndex, IndexEntry};
+pub use codebase::{AnalysisResult, CodeAnalyzer, CodeFile, CodebaseError, CodebaseResult, 
+                   CodebaseScanner, CodebaseStatistics, Dependency, DependencyKind, Function, 
+                   ScannerConfig, Symbol, SymbolKind, Class, CodeMetrics};
 
 // Re-export command execution types
 pub use execution::{CommandError, CommandExecutor, CommandOptions, CommandOutput};

@@ -1,25 +1,26 @@
 [workspace]
 members = [
+    "crates/agents",
+    "crates/ai",
+    "crates/auth",
     "crates/cli",
     "crates/core",
-    "crates/auth",
-    "crates/ai",
-    "crates/terminal",
-    "crates/utils",
-    "crates/mcp",
     "crates/hooks",
+    "crates/mcp",
     "crates/tasks",
-    "crates/agents",
+    "crates/terminal",
     "crates/tools",
+    "crates/utils",
+    "crates/web",
 ]
 resolver = "2"
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["Claude-Rust Contributors"]
+authors = ["Claude Code Contributors"]
 license = "MIT"
-repository = "https://github.com/anthropic/claude-rust"
+repository = "https://github.com/anthropic/claude-code"
 
 [workspace.dependencies]
 # Async Runtime
@@ -36,6 +37,10 @@ anyhow = "1.0"
 
 # HTTP Client
 reqwest = { version = "0.11", features = ["json", "stream", "rustls-tls"], default-features = false }
+
+# Web Framework
+axum = "0.7"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 # CLI & Terminal
 clap = { version = "4.4", features = ["derive", "cargo"] }

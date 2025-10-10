@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-core"
+name = "claude-code-core"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

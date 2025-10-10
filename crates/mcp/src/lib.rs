@@ -7,11 +7,17 @@ pub mod client;
 pub mod protocol;
 pub mod server;
 pub mod types;
+pub mod filesystem_server;
+pub mod git_server;
+pub mod server_manager;
 
 pub use client::McpClient;
 pub use protocol::{McpRequest, McpResponse};
 pub use server::{ServerConfig, McpConfig};
 pub use types::{Resource, Tool, Prompt};
+pub use filesystem_server::FilesystemMcpServer;
+pub use git_server::GitMcpServer;
+pub use server_manager::{McpServerManager, McpServer};
 
 use anyhow::Result;
 

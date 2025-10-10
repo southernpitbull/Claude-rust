@@ -2,7 +2,6 @@
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 use crate::types::{HookPoint, HookType};
@@ -184,6 +183,7 @@ impl HooksConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn test_hooks_for_point() {

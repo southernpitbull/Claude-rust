@@ -5,13 +5,11 @@
 
 pub mod auth;
 pub mod analyze;
-pub mod config;
-pub mod init;
+pub mod interactive;
 pub mod query;
 
 // Re-export commonly used types
 pub use auth::*;
 pub use analyze::*;
-pub use config::*;
-pub use init::*;
+pub use interactive::*;
 pub use query::*;

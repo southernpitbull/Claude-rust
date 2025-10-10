@@ -4,7 +4,7 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
-use tree_sitter::{Language, Parser, Query, QueryCursor};
+use tree_sitter::{Language, Parser};
 use tracing::{debug, info};
 
 use super::scanner::{CodeFile, CodebaseResult};

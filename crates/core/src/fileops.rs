@@ -6,8 +6,7 @@ use std::path::{Path, PathBuf};
 use std::io;
 use std::fs::Metadata;
 use tokio::fs;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 /// File operation result type
 pub type FileResult<T> = Result<T, FileError>;

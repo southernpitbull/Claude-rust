@@ -1,11 +1,10 @@
 //! Hook Executor
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::process::Stdio;
 use std::time::Duration;
-use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 use tracing::{debug, error, info, warn};
 
@@ -106,6 +105,239 @@ impl Hook for ShellHook {
             }
             Err(_) => {
                 warn!("Shell hook timed out after {:?}", self.timeout);
+                Ok(HookResult::failure("Hook execution timed out"))
+            }
+        }
+    }
+}
+
+/// JavaScript hook (using Node.js)
+pub struct JavaScriptHook {
+    script: String,
+    is_file: bool,
+    timeout: Duration,
+}
+
+impl JavaScriptHook {
+    /// Create a new JavaScript hook
+    pub fn new(script: String, is_file: bool, timeout: Duration) -> Self {
+        Self {
+            script,
+            is_file,
+            timeout,
+        }
+    }
+}
+
+#[async_trait]
+impl Hook for JavaScriptHook {
+    async fn execute(&self, context: &HookContext) -> Result<HookResult> {
+        debug!("Executing JavaScript hook");
+
+        // Check if Node.js is available
+        let node_check = Command::new("node")
+            .arg("--version")
+            .output()
+            .await;
+
+        if node_check.is_err() {
+            return Ok(HookResult::failure(
+                "Node.js not found. Please install Node.js to use JavaScript hooks.",
+            ));
+        }
+
+        // Prepare script
+        let script_content = if self.is_file {
+            // Load script from file
+            match tokio::fs::read_to_string(&self.script).await {
+                Ok(content) => content,
+                Err(e) => {
+                    return Ok(HookResult::failure(format!(
+                        "Failed to read script file: {}",
+                        e
+                    )));
+                }
+            }
+        } else {
+            self.script.clone()
+        };
+
+        // Inject context access via process.env.HOOK_CONTEXT
+        let context_json = serde_json::to_string(&context.data)
+            .unwrap_or_else(|_| "{}".to_string());
+
+        // Build Node.js command
+        let mut cmd = Command::new("node");
+        cmd.arg("--eval")
+            .arg(&script_content)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .env("HOOK_POINT", context.point.name())
+            .env("HOOK_CONTEXT", context_json);
+
+        // Execute with timeout
+        let output = tokio::time::timeout(self.timeout, cmd.output()).await;
+
+        match output {
+            Ok(Ok(output)) => {
+                let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+                let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+                let exit_code = output.status.code().unwrap_or(-1);
+
+                Ok(HookResult {
+                    success: output.status.success(),
+                    output: if !stdout.is_empty() {
+                        Some(stdout)
+                    } else {
+                        None
+                    },
+                    error: if !stderr.is_empty() {
+                        Some(stderr)
+                    } else {
+                        None
+                    },
+                    exit_code: Some(exit_code),
+                    block: false,
+                    message: None,
+                })
+            }
+            Ok(Err(e)) => {
+                error!("Failed to execute JavaScript hook: {}", e);
+                Ok(HookResult::failure(format!("Failed to execute: {}", e)))
+            }
+            Err(_) => {
+                warn!("JavaScript hook timed out after {:?}", self.timeout);
+                Ok(HookResult::failure("Hook execution timed out"))
+            }
+        }
+    }
+}
+
+/// Python hook
+pub struct PythonHook {
+    script: String,
+    is_file: bool,
+    timeout: Duration,
+}
+
+impl PythonHook {
+    /// Create a new Python hook
+    pub fn new(script: String, is_file: bool, timeout: Duration) -> Self {
+        Self {
+            script,
+            is_file,
+            timeout,
+        }
+    }
+
+    /// Find Python executable (tries python3, python, py in order)
+    async fn find_python() -> Option<String> {
+        for python_cmd in &["python3", "python", "py"] {
+            let check = Command::new(python_cmd)
+                .arg("--version")
+                .output()
+                .await;
+
+            if check.is_ok() {
+                return Some(python_cmd.to_string());
+            }
+        }
+        None
+    }
+}
+
+#[async_trait]
+impl Hook for PythonHook {
+    async fn execute(&self, context: &HookContext) -> Result<HookResult> {
+        debug!("Executing Python hook");
+
+        // Find Python executable
+        let python_cmd = match Self::find_python().await {
+            Some(cmd) => cmd,
+            None => {
+                return Ok(HookResult::failure(
+                    "Python not found. Please install Python to use Python hooks.",
+                ));
+            }
+        };
+
+        // Prepare script
+        let script_content = if self.is_file {
+            // Load script from file
+            match tokio::fs::read_to_string(&self.script).await {
+                Ok(content) => content,
+                Err(e) => {
+                    return Ok(HookResult::failure(format!(
+                        "Failed to read script file: {}",
+                        e
+                    )));
+                }
+            }
+        } else {
+            // Inline script - add context access helper
+            format!(
+                r#"import os
+import json
+import sys
+
+# Hook context helper
+HOOK_POINT = os.environ.get('HOOK_POINT', '')
+try:
+    HOOK_CONTEXT = json.loads(os.environ.get('HOOK_CONTEXT', '{{}}'))
+except:
+    HOOK_CONTEXT = {{}}
+
+# User script
+{}
+"#,
+                self.script
+            )
+        };
+
+        // Build Python command
+        let context_json = serde_json::to_string(&context.data)
+            .unwrap_or_else(|_| "{}".to_string());
+
+        let mut cmd = Command::new(&python_cmd);
+        cmd.arg("-c")
+            .arg(&script_content)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .env("HOOK_POINT", context.point.name())
+            .env("HOOK_CONTEXT", context_json);
+
+        // Execute with timeout
+        let output = tokio::time::timeout(self.timeout, cmd.output()).await;
+
+        match output {
+            Ok(Ok(output)) => {
+                let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+                let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+                let exit_code = output.status.code().unwrap_or(-1);
+
+                Ok(HookResult {
+                    success: output.status.success(),
+                    output: if !stdout.is_empty() {
+                        Some(stdout)
+                    } else {
+                        None
+                    },
+                    error: if !stderr.is_empty() {
+                        Some(stderr)
+                    } else {
+                        None
+                    },
+                    exit_code: Some(exit_code),
+                    block: false,
+                    message: None,
+                })
+            }
+            Ok(Err(e)) => {
+                error!("Failed to execute Python hook: {}", e);
+                Ok(HookResult::failure(format!("Failed to execute: {}", e)))
+            }
+            Err(_) => {
+                warn!("Python hook timed out after {:?}", self.timeout);
                 Ok(HookResult::failure("Hook execution timed out"))
             }
         }
@@ -221,16 +453,20 @@ impl HookExecutor {
                 hook.execute(context).await
             }
             HookType::JavaScript { script, is_file } => {
-                // JavaScript hooks not yet implemented
-                warn!("JavaScript hooks not yet implemented");
-                Ok(HookResult::failure(
-                    "JavaScript hooks not yet implemented",
-                ))
+                let hook = JavaScriptHook::new(
+                    script.clone(),
+                    *is_file,
+                    timeout,
+                );
+                hook.execute(context).await
             }
             HookType::Python { script, is_file } => {
-                // Python hooks not yet implemented
-                warn!("Python hooks not yet implemented");
-                Ok(HookResult::failure("Python hooks not yet implemented"))
+                let hook = PythonHook::new(
+                    script.clone(),
+                    *is_file,
+                    timeout,
+                );
+                hook.execute(context).await
             }
         }
     }

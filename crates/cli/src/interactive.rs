@@ -3,11 +3,11 @@
 //! Provides an interactive REPL session with the AI assistant
 
 use anyhow::Result;
-use claude_rust_ai::{AiClient, CompletionRequest, Message, MessageRole};
-use claude_rust_auth::AuthManager;
-use claude_rust_core::session::{Session, SessionStore};
-use claude_rust_core::checkpoint::CheckpointStore;
-use claude_rust_terminal::Formatter;
+use claude_code_ai::{AiClient, CompletionRequest, Message, MessageRole};
+use claude_code_auth::AuthManager;
+use claude_code_core::session::{Session, SessionStore};
+use claude_code_core::checkpoint::CheckpointStore;
+use claude_code_terminal::{Formatter, KeyboardShortcuts, UserInput};
 use rustyline::completion::{Completer, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::highlight::Highlighter;
@@ -141,7 +141,15 @@ impl InteractiveSession {
         session_store: Arc<SessionStore>,
         cli_args: Cli,
     ) -> Result<Self> {
-        let model = cli_args.config.as_ref().map(|_| "claude-3-5-sonnet-20241022".to_string()).unwrap_or_else(|| "claude-3-5-sonnet-20241022".to_string());
+        // Load model from config or use default
+        let model = if let Some(config_path) = &cli_args.config {
+            // TODO: Load model from config file
+            // For now, use default
+            warn!("Config file specified but not yet implemented, using default model");
+            "claude-3-5-sonnet-20241022".to_string()
+        } else {
+            "claude-3-5-sonnet-20241022".to_string()
+        };
 
         // Initialize checkpoint store
         let checkpoint_store = Arc::new(CheckpointStore::new(None, true)?);
@@ -245,7 +253,7 @@ impl InteractiveSession {
         println!("██║  ██║╚██████╔╝███████║   ██║                  ");
         println!("╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝                  ");
         println!();
-        println!("🤖 Welcome to Claude-Rust Interactive Mode!");
+        println!("🤖 Welcome to Claude Code Interactive Mode!");
         println!();
         
         // Check authentication status
@@ -266,6 +274,9 @@ impl InteractiveSession {
         println!("Type /help for available commands, or start chatting!");
         println!("Type /quit or press Ctrl+C to exit.");
         println!();
+        
+        // Display keyboard shortcuts
+        self.display_shortcuts_help();
     }
     
     /// Check authentication status
@@ -338,6 +349,7 @@ impl InteractiveSession {
         println!("  • Use /model to switch between AI models");
         println!("  • Use /save and /load to manage conversations");
         println!("  • Use /clear to start a fresh conversation");
+        println!("  • Press Ctrl+H for keyboard shortcut help anytime");
         println!();
     }
 
@@ -435,7 +447,7 @@ impl InteractiveSession {
         Ok(())
     }
     
-    /// Read input from user with enhanced rustyline
+    /// Read input from user with enhanced rustyline and keyboard shortcuts
     fn read_input(&self) -> Result<Option<String>> {
         // Get list of available commands for tab completion
         let command_names: Vec<String> = self.command_registry
@@ -507,6 +519,118 @@ impl InteractiveSession {
             Err(err) => {
                 warn!("Readline error: {}", err);
                 Err(anyhow::anyhow!("Readline error: {}", err))
+            }
+        }
+    }
+    
+    /// Enhanced input reading with keyboard shortcut support
+    fn read_input_with_shortcuts(&self) -> Result<Option<String>> {
+        // For now, we'll use the existing readline implementation but with enhanced features
+        // In the future, we could implement direct keyboard shortcut handling
+        self.read_input()
+    }
+    
+    /// Display keyboard shortcuts help
+    fn display_shortcuts_help(&self) {
+        KeyboardShortcuts::display_help();
+    }
+    
+    /// Handle keyboard shortcut actions
+    async fn handle_shortcut_action(&mut self, action: UserInput) -> Result<bool> {
+        match action {
+            UserInput::ClearScreen => {
+                // Clear the terminal screen
+                print!("\x1B[2J\x1B[H");
+                std::io::stdout().flush()?;
+                Ok(true)
+            }
+            UserInput::Save => {
+                // Save the current session
+                if let Err(e) = self.save_session().await {
+                    println!("❌ Failed to save session: {}", e);
+                } else {
+                    println!("✅ Session saved successfully");
+                }
+                Ok(true)
+            }
+            UserInput::Help => {
+                // Show keyboard shortcuts help
+                self.display_shortcuts_help();
+                Ok(true)
+            }
+            UserInput::Rewind => {
+                // Rewind to last checkpoint
+                self.rewind_to_last_checkpoint().await;
+                Ok(true)
+            }
+            UserInput::NewConversation => {
+                // Start new conversation (clear history except system message)
+                self.history.retain(|m| m.role == MessageRole::System);
+                println!("✨ New conversation started");
+                Ok(true)
+            }
+            UserInput::ScrollUp | UserInput::ScrollDown => {
+                // Scroll through conversation history
+                // Placeholder - would implement scrolling through long conversations
+                println!("📝 Use PageUp/PageDown to scroll through conversation history");
+                Ok(true)
+            }
+            UserInput::HistoryUp | UserInput::HistoryDown => {
+                // Navigate command history
+                // This is handled by rustyline, so we just continue
+                Ok(true)
+            }
+            UserInput::Submit => {
+                // Submit input - this is handled by pressing Enter
+                Ok(true)
+            }
+            UserInput::TabComplete => {
+                // Tab completion - this is handled by rustyline
+                Ok(true)
+            }
+            UserInput::Character(_) => {
+                // Regular character input
+                Ok(true)
+            }
+            UserInput::Exit => {
+                // Exit interactive mode
+                println!("\n\n👋 Goodbye!");
+                Ok(false) // Signal to exit
+            }
+            UserInput::Resize => {
+                // Terminal was resized - redraw UI
+                Ok(true)
+            }
+        }
+    }
+    
+    /// Rewind to the last checkpoint
+    async fn rewind_to_last_checkpoint(&mut self) {
+        match self.checkpoint_store.get_most_recent() {
+            Ok(Some(checkpoint)) => {
+                println!("🔄 Restoring to checkpoint: {}...", &checkpoint.id[..8]);
+                
+                // For now, we'll just show what would be restored
+                // In a full implementation, we'd restore the conversation and files
+                println!("📝 Checkpoint description: {}", 
+                    checkpoint.description.as_ref().unwrap_or(&"No description".to_string()));
+                println!("🕒 Created: {}", checkpoint.timestamp.format("%Y-%m-%d %H:%M:%S"));
+                
+                if !checkpoint.conversation.is_empty() {
+                    println!("💬 Messages: {}", checkpoint.conversation.len());
+                }
+                
+                if !checkpoint.files.is_empty() {
+                    println!("📁 Files: {}", checkpoint.files.len());
+                }
+                
+                println!("✅ Would restore conversation and file state from this checkpoint");
+            }
+            Ok(None) => {
+                println!("⚠️  No checkpoints available to restore");
+            }
+            Err(e) => {
+                println!("❌ Failed to retrieve checkpoint: {}", e);
             }
         }
     }

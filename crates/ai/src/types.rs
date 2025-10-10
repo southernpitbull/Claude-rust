@@ -5,7 +5,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 
 /// Message roles for conversation
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -88,42 +88,46 @@ pub struct Usage {
 pub struct CompletionRequest {
     /// The messages to send to the model
     pub messages: Vec<Message>,
-    
+
     /// The model to use
     pub model: String,
-    
+
     /// Maximum number of tokens to generate
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u32>,
-    
+
     /// Sampling temperature (0.0 to 2.0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f32>,
-    
+
     /// Top-p sampling
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_p: Option<f32>,
-    
+
+    /// Top-k sampling
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_k: Option<u32>,
+
     /// Stop sequences
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stop: Option<Vec<String>>,
-    
+
     /// Frequency penalty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frequency_penalty: Option<f32>,
-    
+
     /// Presence penalty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub presence_penalty: Option<f32>,
-    
+
     /// Number of completions to generate
     #[serde(skip_serializing_if = "Option::is_none")]
     pub n: Option<u32>,
-    
+
     /// Whether to stream the response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
-    
+
     /// Additional options
     #[serde(flatten)]
     pub options: HashMap<String, serde_json::Value>,
@@ -138,6 +142,7 @@ impl CompletionRequest {
             max_tokens: None,
             temperature: Some(1.0),
             top_p: Some(1.0),
+            top_k: None,
             stop: None,
             frequency_penalty: None,
             presence_penalty: None,
@@ -172,25 +177,71 @@ impl CompletionRequest {
     }
 }
 
+/// Stop reason for completion
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StopReason {
+    /// Natural end of completion
+    EndTurn,
+    /// Hit max tokens limit
+    MaxTokens,
+    /// Hit stop sequence
+    StopSequence,
+    /// Content filtered
+    ContentFilter,
+    /// Function/tool call
+    ToolUse,
+    /// Other/unknown reason
+    Other,
+}
+
 /// A chunk of a streaming response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StreamChunk {
     /// The chunk content
     pub content: String,
-    
+
     /// The index of this chunk in the sequence
     pub index: usize,
-    
+
     /// Whether this is the final chunk
     pub is_final: bool,
-    
+
     /// Optional usage information (usually only in final chunk)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage: Option<Usage>,
-    
+
     /// Additional provider-specific fields
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl StreamChunk {
+    /// Create a content delta chunk
+    pub fn content_delta(content: impl Into<String>, index: usize) -> Self {
+        Self {
+            content: content.into(),
+            index,
+            is_final: false,
+            usage: None,
+            extra: HashMap::new(),
+        }
+    }
+
+    /// Create a message complete chunk
+    pub fn message_complete(
+        _id: impl Into<String>,
+        _stop_reason: Option<StopReason>,
+        usage: Option<Usage>,
+    ) -> Self {
+        Self {
+            content: String::new(),
+            index: 0,
+            is_final: true,
+            usage,
+            extra: HashMap::new(),
+        }
+    }
 }
 
 /// A completion response from an AI provider

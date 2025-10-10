@@ -10,7 +10,7 @@
 //! # Examples
 //!
 //! ```no_run
-//! use claude_rust_terminal::{Formatter, Spinner, Prompt, Table};
+//! use claude_code_terminal::{Formatter, Spinner, Prompt, Table};
 //!
 //! // Format colored output
 //! let formatter = Formatter::new(true);
@@ -34,6 +34,7 @@
 
 pub mod error;
 pub mod format;
+pub mod keyboard;
 pub mod prompt;
 pub mod spinner;
 pub mod table;
@@ -41,6 +42,7 @@ pub mod types;
 
 pub use error::{TerminalError, TerminalResult};
 pub use format::{FormatOptions, Formatter, Style, hyperlink, word_wrap};
+pub use keyboard::{KeyboardShortcuts, UserInput};
 pub use prompt::{
     ConfirmPrompt, EditorPrompt, InputPrompt, MultiSelectPrompt, PasswordPrompt, Prompt,
     PromptTheme, SelectPrompt,

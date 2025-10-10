@@ -6,7 +6,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, warn};
 
-use claude_rust_tasks::{Task, TaskExecutor, TaskId};
+use claude_code_tasks::{Task, TaskExecutor, TaskId};
 
 use crate::handler::AgentTaskHandler;
 use crate::registry::AgentRegistry;
@@ -219,7 +219,7 @@ impl TaskDelegator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::AgentType;
+    use crate::types::{Agent, AgentType};
 
     #[tokio::test]
     async fn test_delegate_task() {
@@ -238,6 +238,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert!(task_id.as_uuid().version().is_some());
+        assert!(task_id.as_uuid().get_version().is_some());
     }
 }

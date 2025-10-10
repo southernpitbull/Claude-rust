@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-terminal"
+name = "claude-code-terminal"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,8 +8,8 @@ repository.workspace = true
 
 [dependencies]
 # Workspace crates
-claude-rust-core = { path = "../core" }
-claude-rust-utils = { path = "../utils" }
+claude-code-core = { path = "../core" }
+claude-code-utils = { path = "../utils" }
 
 # Workspace dependencies
 tokio = { workspace = true }

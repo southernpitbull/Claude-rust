@@ -3,12 +3,12 @@
 //! Provides comprehensive logging of authentication events and account usage
 
 use chrono::{DateTime, Utc};
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufWriter, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 /// Maximum number of audit events to keep in memory

@@ -3,9 +3,8 @@
 /// Handles multiple accounts per provider with rotation and pooling
 
 use crate::error::{AuthError, AuthResult};
-use crate::tokens::AuthToken;
 use crate::types::AuthState;
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

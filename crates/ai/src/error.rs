@@ -78,11 +78,11 @@ pub enum AIError {
 
     /// Core error from workspace
     #[error("Core error: {0}")]
-    Core(#[from] claude_rust_core::AppError),
+    Core(#[from] claude_code_core::AppError),
 
     /// Auth error from workspace
     #[error("Auth error: {0}")]
-    AuthError(#[from] claude_rust_auth::AuthError),
+    AuthError(#[from] claude_code_auth::AuthError),
 
     /// URL parse error
     #[error("URL parse error: {0}")]

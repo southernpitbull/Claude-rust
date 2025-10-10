@@ -1,4 +1,4 @@
-use crate::error::{UtilsError, UtilsResult};
+use crate::error::UtilsResult;
 use std::path::Path;
 use tokio::fs;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};

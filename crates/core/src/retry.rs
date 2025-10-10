@@ -201,7 +201,7 @@ mod tests {
         let counter = Arc::new(AtomicU32::new(0));
         let counter_clone = counter.clone();
 
-        let result: Result<(), AppError> = retry_with_policy(
+        let result = retry_with_policy(
             &RetryPolicy::exponential(3),
             || {
                 let counter = counter_clone.clone();
@@ -229,7 +229,7 @@ mod tests {
         let counter = Arc::new(AtomicU32::new(0));
         let counter_clone = counter.clone();
 
-        let result: Result<(), AppError> = retry_with_policy(
+        let result = retry_with_policy(
             &RetryPolicy::exponential(3),
             || {
                 let counter = counter_clone.clone();
@@ -253,7 +253,7 @@ mod tests {
         let counter = Arc::new(AtomicU32::new(0));
         let counter_clone = counter.clone();
 
-        let result: Result<(), AppError> = retry_with_policy(
+        let result = retry_with_policy(
             &RetryPolicy::exponential(3),
             || {
                 let counter = counter_clone.clone();

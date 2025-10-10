@@ -1,10 +1,10 @@
 //! Authentication command handlers.
 
 use anyhow::{Context, Result};
-use claude_rust_auth::{AuthMethod, ProviderAuthConfig};
-use claude_rust_terminal::{Table, Alignment};
-use dialoguer::{Input, Password, Confirm};
+use claude_code_terminal::Table;
+use dialoguer::{Password, Confirm};
 use tracing::{debug, info};
+use chrono::{DateTime, Utc, TimeZone};
 
 use crate::app::App;
 use crate::cli::{AuthCommands, AiProvider, OutputFormat};
@@ -55,13 +55,6 @@ async fn handle_login(
         };
 
         info!("Authenticating with API key for {}", provider_name);
-
-        // Create provider auth config
-        let auth_config = ProviderAuthConfig::new(
-            provider_name.clone(),
-            AuthMethod::ApiKey,
-            key.clone(),
-        );
 
         // Store credentials
         auth_manager
@@ -193,8 +186,7 @@ async fn handle_status(app: &App, detailed: bool) -> Result<()> {
         ("LM Studio", "lmstudio"),
     ];
 
-    let mut table = Table::new();
-    table.set_header(vec!["Provider", "Status", "Method"]);
+    let mut table = Table::new().set_header(vec!["Provider", "Status", "Method"]);
 
     for (display_name, provider_name) in providers {
         let has_creds = auth_manager.has_credentials(provider_name).await;
@@ -215,22 +207,21 @@ async fn handle_status(app: &App, detailed: bool) -> Result<()> {
             "-"
         };
 
-        table.add_row(vec![
+        table = table.add_row(vec![
             display_name.to_string(),
             status,
             method.to_string(),
         ]);
 
         if detailed && has_creds {
-            if let Ok(Some(token)) = auth_manager.get_token(provider_name).await {
+            if let Ok(Some(token)) = auth_manager.get_token_str(provider_name).await {
                 println!();
                 println!("  {}:", display_name);
-                println!("    Token Type: {}", token.token_type().unwrap_or("Bearer"));
-                if let Some(expires_at) = token.expires_at() {
-                    println!("    Expires: {}", expires_at.to_rfc3339());
-                }
-                if let Some(scopes) = token.scopes() {
-                    println!("    Scopes: {}", scopes.join(", "));
+                println!("    Token Type: {}", token.token_type);
+                let expires_at: DateTime<Utc> = Utc.timestamp_opt(token.expires_at, 0).unwrap();
+                println!("    Expires: {}", expires_at.to_rfc3339());
+                if !token.scope.is_empty() {
+                    println!("    Scopes: {}", token.scope);
                 }
             }
         }
@@ -270,10 +261,9 @@ async fn handle_accounts(app: &App, format: OutputFormat) -> Result<()> {
                 "OAuth"
             };
 
-            let expires = if let Ok(Some(token)) = auth_manager.get_token(provider_name).await {
-                token.expires_at()
-                    .map(|dt| dt.to_rfc3339())
-                    .unwrap_or_else(|| "Never".to_string())
+            let expires = if let Ok(Some(token)) = auth_manager.get_token_str(provider_name).await {
+                let expires_at: DateTime<Utc> = Utc.timestamp_opt(token.expires_at, 0).unwrap();
+                expires_at.to_rfc3339()
             } else {
                 "Unknown".to_string()
             };
@@ -285,7 +275,7 @@ async fn handle_accounts(app: &App, format: OutputFormat) -> Result<()> {
     if accounts.is_empty() {
         formatter.print_warning("No authenticated accounts found");
         println!();
-        formatter.print_info("Run 'claude-rust auth login --provider <PROVIDER>' to authenticate");
+        formatter.print_info("Run 'claude-code auth login --provider <PROVIDER>' to authenticate");
         return Ok(());
     }
 
@@ -294,11 +284,10 @@ async fn handle_accounts(app: &App, format: OutputFormat) -> Result<()> {
             formatter.print_header("Authenticated Accounts");
             println!();
 
-            let mut table = Table::new();
-            table.set_header(vec!["Provider", "Method", "Expires"]);
+            let mut table = Table::new().set_header(vec!["Provider", "Method", "Expires"]);
 
             for (display_name, _, method, expires) in accounts {
-                table.add_row(vec![
+                table = table.add_row(vec![
                     display_name.to_string(),
                     method.to_string(),
                     expires,

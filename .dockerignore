@@ -1,0 +1,131 @@
+# .dockerignore - Docker build context exclusions
+# Excludes files and directories that are not needed in the Docker build context
+
+# Git directory
+.git/
+.gitignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+target/
+**/target/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+
+# Configuration files (some may be needed, but exclude most)
+**/node_modules/
+**/.env*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Test files
+coverage/
+.nyc_output/
+**/__tests__/**
+**/*.test.js
+**/*.spec.js
+**/*.test.ts
+**/*.spec.ts
+
+# Documentation (if building docs in container, remove this)
+docs/
+**/*.md
+**/*.rst
+**/*.txt
+LICENSE*
+README*
+
+# Docker and CI files (we're building the Docker image, so we don't need these inside)
+Dockerfile
+.dockerignore
+docker-compose.yml
+.github/
+.gitlab/
+
+# Rust specific
+Cargo.lock
+**/Cargo.lock
+.rustup/
+.cargo/
+cargo-home/
+
+# Python specific (in case there are Python dependencies)
+**/__pycache__/
+**/*.pyc
+**/venv/
+**/.venv/
+**/pip-wheel-metadata/
+
+# Node.js specific
+**/node_modules/
+**/package-lock.json
+**/yarn.lock
+**/.npm/
+
+# macOS specific
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+
+# Windows specific
+**/Thumbs.db
+**/ehthumbs.db
+**/[Dd]esktop.ini
+**/$RECYCLE.BIN/
+
+# JetBrains specific
+**/.idea/
+**/*/*.iws
+**/*/*.iml
+**/*/*.ipr
+
+# Vim specific
+**/.[Vv]*.sw[op]
+**/.netrwhist
+**/*~
+
+# Temporary files
+**/*.tmp
+**/*.bak
+**/*.backup
+
+# Compiled executables
+**/*.exe
+**/*.dll
+**/*.so
+**/*.dylib
+
+# Archive files
+**/*.zip
+**/*.tar.gz
+**/*.rar
+**/*.7z
+
+# Database files
+**/*.db
+**/*.sqlite
+**/*.mdb
+
+# Certificates and keys (be careful with these!)
+**/*.key
+**/*.pem
+**/*.crt
+**/*.cer
+**/*.der
+
+# Exclude everything and then selectively include what we need
+# This is more efficient than excluding many files

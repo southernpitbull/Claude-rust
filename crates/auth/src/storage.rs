@@ -1,6 +1,6 @@
-use crate::error::{AuthError, AuthResult};
+use crate::error::AuthResult;
 use crate::tokens::AuthToken;
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 use keyring::Entry;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

@@ -6,7 +6,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{debug, info};
 
-use crate::types::{Task, TaskId, TaskPriority, TaskStatus};
+use crate::types::{Task, TaskId, TaskStatus};
 
 /// Task queue for managing pending tasks
 pub struct TaskQueue {
@@ -134,6 +134,7 @@ impl TaskQueue {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::TaskPriority;
 
     #[tokio::test]
     async fn test_enqueue_dequeue() {

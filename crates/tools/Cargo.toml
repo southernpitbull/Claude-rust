@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-tools"
+name = "claude-code-tools"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,7 +13,9 @@ tracing = { workspace = true }
 thiserror = { workspace = true }
 
 # Local dependencies
-claude-rust-core = { path = "../core" }
+claude-code-core = { path = "../core" }
 
 # Additional dependencies
 regex = "1.10"
+reqwest = { version = "0.11", features = ["json"] }
+urlencoding = "2.1"

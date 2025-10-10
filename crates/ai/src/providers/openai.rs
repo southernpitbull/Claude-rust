@@ -181,13 +181,144 @@ impl AiProvider for OpenAiProvider {
         &self,
         request: &CompletionRequest,
     ) -> AIResult<BoxStream<'static, AIResult<StreamChunk>>> {
-        // Streaming implementation for OpenAI would use Server-Sent Events (SSE)
-        // This is a simplified version - in practice, you'd need to handle SSE properly
-        let error = AIError::Internal("Streaming not fully implemented for OpenAI provider".to_string());
-        let stream = futures::stream::once(async move {
-            Err(error)
-        }).boxed();
-        Ok(stream)
+        let openai_messages = self.convert_messages(&request.messages);
+
+        let api_request = OpenAiRequest {
+            model: request.model.clone(),
+            messages: openai_messages,
+            temperature: request.temperature,
+            top_p: request.top_p,
+            max_tokens: request.max_tokens,
+            stop: request.stop.clone(),
+            stream: Some(true), // Enable streaming
+            frequency_penalty: request.frequency_penalty,
+            presence_penalty: request.presence_penalty,
+        };
+
+        let url = if let Some(ref base_url) = self.config.base_url {
+            format!("{}/v1/chat/completions", base_url)
+        } else {
+            "https://api.openai.com/v1/chat/completions".to_string()
+        };
+
+        let api_key = self.config.api_key.clone(); // Clone the API key for the stream
+
+        // Define OpenAI streaming response structures
+        #[derive(Debug, Deserialize)]
+        struct OpenAiStreamResponse {
+            id: String,
+            object: String,
+            created: u64,
+            model: String,
+            choices: Vec<OpenAiStreamChoice>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct OpenAiStreamChoice {
+            index: u32,
+            delta: OpenAiDelta,
+            #[serde(rename = "finish_reason")]
+            finish_reason: Option<String>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct OpenAiDelta {
+            role: Option<String>,
+            content: Option<String>,
+        }
+
+        // Create a stream that makes the API request and processes the response
+        use async_stream::stream;
+        let client = self.client.clone();
+        let stream = stream! {
+            let response = client
+                .post(&url)
+                .header("Content-Type", "application/json")
+                .header("Authorization", format!("Bearer {}", api_key))
+                .json(&api_request)
+                .send()
+                .await;
+
+            match response {
+                Ok(resp) => {
+                    if !resp.status().is_success() {
+                        let status = resp.status().as_u16();
+                        let error_text = resp.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                        yield Err(AIError::Api {
+                            status,
+                            message: error_text,
+                            provider: "openai".to_string(),
+                        });
+                        return;
+                    }
+
+                    let mut stream = resp.bytes_stream();
+                    let mut buffer = String::new();
+                    let mut content = String::new();
+                    let mut index = 0;
+
+                    while let Some(chunk) = stream.next().await {
+                        match chunk {
+                            Ok(bytes) => {
+                                let text = String::from_utf8_lossy(&bytes);
+                                
+                                // Process each line of the SSE response
+                                for line in text.lines() {
+                                    let line = line.trim();
+                                    
+                                    if line.starts_with("data: ") {
+                                        let data = &line[6..]; // Remove "data: " prefix
+                                        
+                                        if data == "[DONE]" {
+                                            yield Ok(StreamChunk::message_complete(
+                                                uuid::Uuid::new_v4().to_string(),
+                                                Some(crate::types::StopReason::EndTurn),
+                                                None,
+                                            ));
+                                            return;
+                                        }
+                                        
+                                        // Parse OpenAI's streaming response
+                                        match serde_json::from_str::<OpenAiStreamResponse>(data) {
+                                            Ok(stream_resp) => {
+                                                if !stream_resp.choices.is_empty() {
+                                                    let choice = &stream_resp.choices[0];
+                                                    if let Some(ref content_str) = choice.delta.content {
+                                                        content.push_str(content_str);
+                                                        yield Ok(StreamChunk::content_delta(content_str.to_string(), index));
+                                                        index += 1;
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                // Log error but continue processing
+                                                eprintln!("Error parsing OpenAI stream response: {:?}", e);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                yield Err(AIError::Network(e));
+                                return;
+                            }
+                        }
+                    }
+
+                    // Send completion chunk if not already sent
+                    yield Ok(StreamChunk::message_complete(
+                        uuid::Uuid::new_v4().to_string(),
+                        Some(crate::types::StopReason::EndTurn),
+                        None,
+                    ));
+                }
+                Err(e) => {
+                    yield Err(AIError::Network(e));
+                }
+            }
+        };
+
+        Ok(Box::pin(stream))
     }
 
     async fn test_connection(&self) -> AIResult<bool> {

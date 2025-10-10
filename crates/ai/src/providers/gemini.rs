@@ -228,13 +228,110 @@ impl AiProvider for GeminiProvider {
         &self,
         request: &CompletionRequest,
     ) -> AIResult<BoxStream<'static, AIResult<StreamChunk>>> {
-        // Streaming implementation for Gemini would use Server-Sent Events (SSE)
-        // This is a simplified version - in practice, you'd need to handle SSE properly
-        let error = AIError::Internal("Streaming not fully implemented for Gemini provider".to_string());
-        let stream = futures::stream::once(async move {
-            Err(error)
-        }).boxed();
-        Ok(stream)
+        let gemini_messages = self.convert_messages(&request.messages);
+
+        let url = if let Some(ref base_url) = self.config.base_url {
+            format!("{}/v1beta/models/{}:streamGenerateContent", base_url, request.model)
+        } else {
+            format!("https://generativelanguage.googleapis.com/v1beta/models/{}:streamGenerateContent?key={}", 
+                    request.model, self.config.api_key)
+        };
+
+        let api_request = GeminiRequest {
+            contents: gemini_messages,
+            generation_config: Some(GeminiGenerationConfig {
+                temperature: request.temperature,
+                top_p: request.top_p,
+                top_k: request.top_k.map(|k| k as i32),
+                max_output_tokens: request.max_tokens.map(|t| t as i32),
+                stop_sequences: request.stop.clone(),
+            }),
+            safety_settings: None, // Use default safety settings
+        };
+
+        // Create a stream that makes the API request and processes the response
+        use async_stream::stream;
+        let client = self.client.clone();
+        let stream = stream! {
+            let response = client
+                .post(&url)
+                .header("Content-Type", "application/json")
+                .json(&api_request)
+                .send()
+                .await;
+
+            match response {
+                Ok(resp) => {
+                    if !resp.status().is_success() {
+                        let status = resp.status().as_u16();
+                        let error_text = resp.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                        yield Err(AIError::Api {
+                            status,
+                            message: error_text,
+                            provider: "gemini".to_string(),
+                        });
+                        return;
+                    }
+
+                    let mut stream = resp.bytes_stream();
+                    let mut buffer = String::new();
+                    let mut content = String::new();
+                    let mut index = 0;
+
+                    while let Some(chunk) = stream.next().await {
+                        match chunk {
+                            Ok(bytes) => {
+                                buffer.push_str(&String::from_utf8_lossy(&bytes));
+                                
+                                // Process the JSON response (multiple JSON objects separated by newlines)
+                                while let Some(pos) = buffer.find('\n') {
+                                    let line = buffer[..pos].trim().to_string();
+                                    buffer = buffer[pos + 1..].to_string();
+
+                                    if !line.is_empty() {
+                                        // Parse Gemini's streaming response
+                                        match serde_json::from_str::<GeminiResponse>(&line) {
+                                            Ok(api_response) => {
+                                                // Extract content from the response
+                                                if let Some(candidates) = api_response.candidates {
+                                                    for candidate in candidates {
+                                                        for part in candidate.content.parts {
+                                                            let text = part.text;
+                                                            content.push_str(&text);
+                                                            yield Ok(StreamChunk::content_delta(text, index));
+                                                            index += 1;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Err(_) => {
+                                                // Ignore parsing errors for this line
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                yield Err(AIError::Network(e));
+                                return;
+                            }
+                        }
+                    }
+
+                    // At the end, send a completion chunk
+                    yield Ok(StreamChunk::message_complete(
+                        uuid::Uuid::new_v4().to_string(),
+                        Some(crate::types::StopReason::EndTurn),
+                        None,
+                    ));
+                }
+                Err(e) => {
+                    yield Err(AIError::Network(e));
+                }
+            }
+        };
+
+        Ok(Box::pin(stream))
     }
 
     async fn test_connection(&self) -> AIResult<bool> {

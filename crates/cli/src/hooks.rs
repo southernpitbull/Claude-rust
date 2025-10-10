@@ -1,7 +1,7 @@
 //! Hooks System
 //!
 //! Provides a flexible hook system for executing code at specific points
-//! during the Claude-Rust workflow.
+//! during the Claude Code workflow.
 
 use crate::settings::{HookConfig, BehaviorSettings};
 use anyhow::Result;

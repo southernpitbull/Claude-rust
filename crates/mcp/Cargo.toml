@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-mcp"
+name = "claude-code-mcp"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -16,6 +16,9 @@ tracing = { workspace = true }
 
 # Async channel for communication
 async-channel = "2.3"
+
+# Random number generation for reconnection jitter
+rand = "0.8"
 
 # Optional: For stdio-based MCP servers
 tokio-util = { version = "0.7", features = ["codec"] }

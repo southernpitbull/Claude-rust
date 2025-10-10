@@ -2,10 +2,9 @@
 ///
 /// Provides functions for formatting and displaying text in the terminal.
 
-use colored::{Color, ColoredString, Colorize};
-use crossterm::style::{Attribute, SetAttribute};
+use colored::{Color, Colorize};
+use crossterm::style::Attribute;
 use regex::Regex;
-use std::io::Write;
 
 /// Text formatting style
 #[derive(Debug, Clone, Copy)]
@@ -400,6 +399,62 @@ impl Formatter {
 impl Default for Formatter {
     fn default() -> Self {
         Self::new(true)
+    }
+}
+
+// Convenience print methods
+impl Formatter {
+    /// Print a success message
+    pub fn print_success(&self, text: &str) {
+        println!("{}", self.success(text));
+    }
+
+    /// Print an error message
+    pub fn print_error(&self, text: &str) {
+        eprintln!("{}", self.error(text));
+    }
+
+    /// Print a warning message
+    pub fn print_warning(&self, text: &str) {
+        println!("{}", self.warning(text));
+    }
+
+    /// Print an info message
+    pub fn print_info(&self, text: &str) {
+        println!("{}", self.info(text));
+    }
+
+    /// Print dimmed text
+    pub fn print_dim(&self, text: &str) {
+        println!("{}", self.style(text, Style::Dim));
+    }
+
+    /// Print a header (bold and underlined)
+    pub fn print_header(&self, text: &str) {
+        let formatted = if self.colors_enabled {
+            text.bold().underline().to_string()
+        } else {
+            format!("=== {} ===", text)
+        };
+        println!("{}", formatted);
+    }
+
+    /// Style text as success (returns formatted string)
+    pub fn style_success(&self, text: &str) -> String {
+        if self.colors_enabled {
+            text.green().to_string()
+        } else {
+            text.to_string()
+        }
+    }
+
+    /// Style text as dimmed (returns formatted string)
+    pub fn style_dim(&self, text: &str) -> String {
+        if self.colors_enabled {
+            text.dimmed().to_string()
+        } else {
+            text.to_string()
+        }
     }
 }
 

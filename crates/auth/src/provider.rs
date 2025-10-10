@@ -4,7 +4,7 @@
 
 use crate::error::{AuthError, AuthResult};
 use crate::types::AuthMethod;
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 use serde::{Deserialize, Serialize};
 
 /// Provider authentication configuration

@@ -4,11 +4,11 @@
 
 use crate::error::{AuthError, AuthResult};
 use crate::oauth::{
-    ClaudeOAuth, OpenAIOAuth, GeminiOAuth, QwenOAuth, OllamaProvider, LMStudioProvider, TokenResponse, OAuthProvider
+    ClaudeOAuth, OpenAIOAuth, GeminiOAuth, QwenOAuth, TokenResponse, OAuthProvider
 };
 use crate::storage::CredentialStore;
 use crate::tokens::AuthToken;
-use claude_rust_core::types::ProviderType;
+use claude_code_core::types::ProviderType;
 use std::sync::Arc;
 use tracing::{debug, info, warn};
 
@@ -210,7 +210,7 @@ impl Default for OAuthManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use claude_rust_core::types::ProviderType;
+    use claude_code_core::types::ProviderType;
 
     #[test]
     fn test_oauth_manager_creation() {

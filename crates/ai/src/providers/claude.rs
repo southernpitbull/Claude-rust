@@ -193,13 +193,184 @@ impl AiProvider for ClaudeProvider {
         &self,
         request: &CompletionRequest,
     ) -> AIResult<BoxStream<'static, AIResult<StreamChunk>>> {
-        // Streaming implementation for Claude would use Server-Sent Events (SSE)
-        // This is a simplified version - in practice, you'd need to handle SSE properly
-        let error = AIError::Internal("Streaming not fully implemented for Claude provider".to_string());
-        let stream = futures::stream::once(async move {
-            Err(error)
-        }).boxed();
-        Ok(stream)
+        let claude_messages = self.convert_messages(&request.messages);
+        
+        let system_content = request
+            .messages
+            .iter()
+            .find(|m| m.role == MessageRole::System)
+            .map(|m| m.content.clone());
+
+        let api_request = ClaudeApiRequest {
+            model: request.model.clone(),
+            messages: claude_messages,
+            max_tokens: Some(request.max_tokens.unwrap_or(4096)),
+            temperature: request.temperature,
+            top_p: request.top_p,
+            top_k: None, // Claude-specific parameter
+            stop_sequences: request.stop.clone(),
+            stream: Some(true), // Enable streaming
+            system: system_content,
+        };
+
+        let url = "https://api.anthropic.com/v1/messages";
+        let api_key = self.config.api_key.clone(); // Clone the API key for the stream
+
+        // Define Claude streaming response structures
+        #[derive(Debug, Deserialize)]
+        struct ClaudeStreamResponse {
+            #[serde(rename = "type")]
+            r#type: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            index: Option<usize>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            content_block: Option<ClaudeStreamContentBlock>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            delta: Option<ClaudeStreamDelta>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            message: Option<ClaudeStreamMessage>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct ClaudeStreamContentBlock {
+            #[serde(rename = "type")]
+            content_type: String,
+            text: Option<String>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct ClaudeStreamDelta {
+            #[serde(rename = "type")]
+            delta_type: String,
+            text: Option<String>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct ClaudeStreamMessage {
+            id: String,
+            model: String,
+            #[serde(rename = "stop_reason")]
+            finish_reason: Option<String>,
+            #[serde(rename = "stop_sequence")]
+            stop_sequence: Option<String>,
+        }
+
+        // Create a stream that makes the API request and processes the response
+        use async_stream::stream;
+        let client = self.client.clone();
+        let stream = stream! {
+            let response = client
+                .post(url)
+                .header("Content-Type", "application/json")
+                .header("x-api-key", &api_key)
+                .header("anthropic-version", "2023-06-01")
+                .header("accept", "text/event-stream")
+                .header("cache-control", "no-cache")
+                .header("connection", "keep-alive")
+                .json(&api_request)
+                .send()
+                .await;
+
+            match response {
+                Ok(resp) => {
+                    if !resp.status().is_success() {
+                        let status = resp.status().as_u16();
+                        let error_text = resp.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                        yield Err(AIError::Api {
+                            status,
+                            message: error_text,
+                            provider: "claude".to_string(),
+                        });
+                        return;
+                    }
+
+                    let mut stream = resp.bytes_stream();
+                    let mut content = String::new();
+                    let mut index = 0;
+
+                    while let Some(chunk) = stream.next().await {
+                        match chunk {
+                            Ok(bytes) => {
+                                let text = String::from_utf8_lossy(&bytes);
+                                
+                                // Process each line of the SSE response
+                                for line in text.lines() {
+                                    let line = line.trim();
+                                    
+                                    if line.starts_with("data: ") {
+                                        let data = &line[6..]; // Remove "data: " prefix
+                                        
+                                        if data == "[DONE]" {
+                                            yield Ok(StreamChunk::message_complete(
+                                                uuid::Uuid::new_v4().to_string(),
+                                                Some(crate::types::StopReason::EndTurn),
+                                                None,
+                                            ));
+                                            return;
+                                        }
+                                        
+                                        // Parse the streaming event
+                                        match serde_json::from_str::<ClaudeStreamResponse>(data) {
+                                            Ok(stream_resp) => {
+                                                match stream_resp.r#type.as_str() {
+                                                    "content_block_start" => {
+                                                        if let Some(content_block) = stream_resp.content_block {
+                                                            if let Some(text) = content_block.text {
+                                                                content.push_str(&text);
+                                                                yield Ok(StreamChunk::content_delta(text, index));
+                                                                index += 1;
+                                                            }
+                                                        }
+                                                    }
+                                                    "content_block_delta" => {
+                                                        if let Some(delta) = stream_resp.delta {
+                                                            if let Some(text_delta) = delta.text {
+                                                                content.push_str(&text_delta);
+                                                                yield Ok(StreamChunk::content_delta(text_delta, index));
+                                                                index += 1;
+                                                            }
+                                                        }
+                                                    }
+                                                    "content_block_stop" => {
+                                                        // Content block finished
+                                                    }
+                                                    "message_start" | "message_delta" | "message_stop" => {
+                                                        if stream_resp.r#type == "message_stop" {
+                                                            yield Ok(StreamChunk::message_complete(
+                                                                uuid::Uuid::new_v4().to_string(),
+                                                                Some(crate::types::StopReason::EndTurn),
+                                                                None,
+                                                            ));
+                                                            return;
+                                                        }
+                                                    }
+                                                    _ => {
+                                                        // Other event types are ignored for now
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                // Log error but continue processing
+                                                eprintln!("Error parsing Claude stream response: {:?}", e);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                yield Err(AIError::Network(e));
+                                return;
+                            }
+                        }
+                    }
+                }
+                Err(e) => {
+                    yield Err(AIError::Network(e));
+                }
+            }
+        };
+
+        Ok(Box::pin(stream))
     }
 
     async fn test_connection(&self) -> AIResult<bool> {

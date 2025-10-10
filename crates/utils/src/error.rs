@@ -11,7 +11,7 @@ pub enum UtilsError {
     Network(#[from] reqwest::Error),
 
     #[error("Core error: {0}")]
-    Core(#[from] claude_rust_core::AppError),
+    Core(#[from] claude_code_core::AppError),
 
     #[error("Utility error: {0}")]
     Utility(String),

@@ -1,5 +1,5 @@
 //! Qwen Provider Implementation
-//! 
+//!
 //! Implements the AiProvider trait for Alibaba's Qwen API
 
 use crate::provider::{AiProvider, ProviderConfig};
@@ -41,6 +41,8 @@ struct QwenParameters {
     stop: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     repetition_penalty: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stream: Option<bool>,
 }
 
 /// Qwen API response format
@@ -139,6 +141,7 @@ impl AiProvider for QwenProvider {
             top_k: None, // Qwen-specific parameter
             stop: request.stop.clone(),
             repetition_penalty: None, // Qwen-specific parameter
+            stream: Some(false), // Not streaming
         });
 
         let api_request = QwenRequest {
@@ -183,13 +186,166 @@ impl AiProvider for QwenProvider {
         &self,
         request: &CompletionRequest,
     ) -> AIResult<BoxStream<'static, AIResult<StreamChunk>>> {
-        // Streaming implementation for Qwen would use Server-Sent Events (SSE)
-        // This is a simplified version - in practice, you'd need to handle SSE properly
-        let error = AIError::Internal("Streaming not fully implemented for Qwen provider".to_string());
-        let stream = futures::stream::once(async move {
-            Err(error)
-        }).boxed();
-        Ok(stream)
+        let qwen_messages = self.convert_messages(&request.messages);
+
+        let parameters = Some(QwenParameters {
+            max_tokens: request.max_tokens,
+            temperature: request.temperature,
+            top_p: request.top_p,
+            top_k: None, // Qwen-specific parameter, not set from request
+            stop: request.stop.clone(),
+            repetition_penalty: None, // Qwen-specific parameter
+            stream: Some(true), // Enable streaming
+        });
+
+        let api_request = QwenRequest {
+            model: request.model.clone(),
+            messages: qwen_messages,
+            parameters,
+        };
+
+        let url = if let Some(ref base_url) = self.config.base_url {
+            format!("{}/api/v1/services/aigc/text-generation/generation", base_url)
+        } else {
+            "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation".to_string()
+        };
+
+        let api_key = self.config.api_key.clone();
+
+        // Define Qwen streaming response structures
+        #[derive(Debug, Deserialize)]
+        struct QwenStreamResponse {
+            output: QwenStreamOutput,
+            #[serde(rename = "request_id")]
+            request_id: String,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct QwenStreamOutput {
+            text: Option<String>,
+            #[serde(rename = "finish_reason")]
+            finish_reason: Option<String>,
+        }
+
+        // Create a stream that makes the API request and processes the response
+        use async_stream::stream;
+        let client = self.client.clone();
+        let stream = stream! {
+            let response = client
+                .post(&url)
+                .header("Content-Type", "application/json")
+                .header("Authorization", format!("Bearer {}", api_key))
+                .header("X-DashScope-SSE", "enable")
+                .json(&api_request)
+                .send()
+                .await;
+
+            match response {
+                Ok(resp) => {
+                    if !resp.status().is_success() {
+                        let status = resp.status().as_u16();
+                        let error_text = resp.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                        yield Err(AIError::Api {
+                            status,
+                            message: error_text,
+                            provider: "qwen".to_string(),
+                        });
+                        return;
+                    }
+
+                    let mut stream = resp.bytes_stream();
+                    let mut accumulated_content = String::new();
+                    let mut index = 0;
+
+                    while let Some(chunk) = stream.next().await {
+                        match chunk {
+                            Ok(bytes) => {
+                                let text = String::from_utf8_lossy(&bytes);
+
+                                // Process each line of the SSE response
+                                for line in text.lines() {
+                                    let line = line.trim();
+
+                                    if line.starts_with("data:") {
+                                        let data = line[5..].trim();
+
+                                        if data == "[DONE]" {
+                                            // Final chunk with accumulated content
+                                            let final_chunk = StreamChunk {
+                                                content: accumulated_content.clone(),
+                                                index,
+                                                is_final: true,
+                                                usage: None,
+                                                extra: HashMap::new(),
+                                            };
+                                            yield Ok(final_chunk);
+                                            return;
+                                        }
+
+                                        // Parse Qwen's streaming response
+                                        match serde_json::from_str::<QwenStreamResponse>(data) {
+                                            Ok(stream_resp) => {
+                                                if let Some(text) = stream_resp.output.text {
+                                                    if !text.is_empty() {
+                                                        accumulated_content = text.clone();
+                                                        let chunk = StreamChunk {
+                                                            content: text,
+                                                            index,
+                                                            is_final: false,
+                                                            usage: None,
+                                                            extra: HashMap::new(),
+                                                        };
+                                                        yield Ok(chunk);
+                                                        index += 1;
+                                                    }
+                                                }
+
+                                                // Check for completion
+                                                if let Some(finish_reason) = stream_resp.output.finish_reason {
+                                                    if !finish_reason.is_empty() && finish_reason != "null" {
+                                                        let final_chunk = StreamChunk {
+                                                            content: accumulated_content.clone(),
+                                                            index,
+                                                            is_final: true,
+                                                            usage: None,
+                                                            extra: HashMap::new(),
+                                                        };
+                                                        yield Ok(final_chunk);
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                eprintln!("Error parsing Qwen stream response: {:?}", e);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                yield Err(AIError::Network(e));
+                                return;
+                            }
+                        }
+                    }
+
+                    // Send final chunk if not already sent
+                    let final_chunk = StreamChunk {
+                        content: accumulated_content,
+                        index,
+                        is_final: true,
+                        usage: None,
+                        extra: HashMap::new(),
+                    };
+                    yield Ok(final_chunk);
+                }
+                Err(e) => {
+                    yield Err(AIError::Network(e));
+                }
+            }
+        };
+
+        Ok(Box::pin(stream))
     }
 
     async fn test_connection(&self) -> AIResult<bool> {

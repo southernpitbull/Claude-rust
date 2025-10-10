@@ -1,5 +1,5 @@
 [package]
-name = "claude-rust-tasks"
+name = "claude-code-tasks"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

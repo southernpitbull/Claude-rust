@@ -9,7 +9,7 @@ use tokio::sync::Mutex;
 use tracing::{debug, error, info, warn};
 
 use crate::queue::TaskQueue;
-use crate::types::{Task, TaskId, TaskResult, TaskStatus};
+use crate::types::{Task, TaskId, TaskResult};
 
 /// Task handler trait
 #[async_trait]
@@ -250,6 +250,7 @@ impl TaskExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::TaskStatus;
 
     struct TestHandler;
 

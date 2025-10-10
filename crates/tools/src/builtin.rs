@@ -1,11 +1,11 @@
 //! Built-in Tools
 //!
-//! Standard tools provided by Claude-Rust
+//! Standard tools provided by Claude Code
 
 use crate::registry::ToolRegistry;
 use crate::tool::{Tool, ToolCategory, ToolDefinition, ToolParameter, ToolParameterType};
 use async_trait::async_trait;
-use claude_rust_core::{FileOps, CommandExecutor, CommandOptions};
+use claude_code_core::{FileOps, CommandExecutor, CommandOptions};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -285,7 +285,7 @@ impl WebSearchTool {
     pub fn new() -> Self {
         let definition = ToolDefinition::new(
             "web-search",
-            "Search the web (placeholder)",
+            "Search the web for information",
             ToolCategory::Web,
         )
         .parameter(ToolParameter::required("query", "Search query", ToolParameterType::String))
@@ -311,17 +311,63 @@ impl Tool for WebSearchTool {
         let query = params.get("query")
             .and_then(|v| v.as_str())
             .ok_or("query is required")?;
+            
+        let max_results = params.get("max_results")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(5) as usize;
 
-        // Placeholder implementation
-        Ok(serde_json::json!({
-            "status": "not_implemented",
-            "query": query,
-            "message": "Web search not yet implemented",
-        }))
+        // Use DuckDuckGo Instant Answer API for simple web search
+        let client = reqwest::Client::new();
+        let url = format!("https://api.duckduckgo.com/?q={}&format=json&no_html=1&skip_disambig=1", 
+                         urlencoding::encode(query));
+        
+        match client.get(&url).send().await {
+            Ok(response) => {
+                if response.status().is_success() {
+                    match response.json::<serde_json::Value>().await {
+                        Ok(json_response) => {
+                            // Extract relevant information from DDG response
+                            let abstract_text = json_response.get("AbstractText")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("");
+                            
+                            let abstract_source = json_response.get("AbstractSource")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("");
+                                
+                            let results = json_response.get("RelatedTopics")
+                                .and_then(|v| v.as_array())
+                                .map(|arr| {
+                                    arr.iter()
+                                        .take(max_results)
+                                        .filter_map(|item| {
+                                            item.get("Text").and_then(|v| v.as_str())
+                                        })
+                                        .collect::<Vec<_>>()
+                                })
+                                .unwrap_or_default();
+                            
+                            Ok(serde_json::json!({
+                                "status": "success",
+                                "query": query,
+                                "abstract": abstract_text,
+                                "source": abstract_source,
+                                "results": results,
+                                "total_results": results.len()
+                            }))
+                        },
+                        Err(_) => Err("Failed to parse search response".to_string())
+                    }
+                } else {
+                    Err("Failed to fetch search results".to_string())
+                }
+            },
+            Err(_) => Err("Failed to connect to search service".to_string())
+        }
     }
 
     fn is_available(&self) -> bool {
-        false // Not yet implemented
+        true // Now implemented
     }
 }
 
