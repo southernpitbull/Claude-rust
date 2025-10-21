@@ -1,0 +1,28 @@
+[package]
+name = "ai-cli-bindings"
+version = "1.0.0"
+edition = "2021"
+authors = ["AIrchitect Team"]
+description = "Language interoperability layer"
+license = "MIT"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+pyo3 = { version = "0.20", features = ["extension-module"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = "0.3"
+ai-cli-core = { path = "../crates/core" }
+ai-cli-ai-engine = { path = "../crates/ai-engine" }
+ai-cli-memory-system = { path = "../crates/memory-system" }
+ai-cli-agent-framework = { path = "../crates/agent-framework" }
+ai-cli-security = { path = "../crates/security" }
+ai-cli-checkpoint = { path = "../crates/checkpoint" }
+ai-cli-tui = { path = "../crates/tui" }
+ai-cli-providers = { path = "../crates/providers" }
+ai-cli-utils = { path = "../crates/utils" }

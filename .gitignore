@@ -1,0 +1,159 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+target/
+
+# Coverage
+.coverage
+.nyc_output
+coverage/
+*.lcov
+
+# TypeScript
+*.tsbuildinfo
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Rust
+target/
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.python-version
+.pytest_cache/
+.pyre/
+.pytype/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+iTunes Music Library.xml
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary folders
+tmp/
+temp/
+
+# Documentation
+doc/
+docs/
+
+# Database
+*.db
+*.db.*
+
+# Editor-specific files
+*.sublime-workspace
+*.swm
+.vscode/settings.json
+*.vsix
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+#	swap
+.sw[a-p]
+#	volatile
+.viminfo
+
+# Intellij
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# Platform-specific files
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.Local.mru
+*.user
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Lock files for packages
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# System-specific files that should not be committed
+nul
+
+# Temporary files
+*.new
+
+# Executables
+*.exe
+powershell.exe

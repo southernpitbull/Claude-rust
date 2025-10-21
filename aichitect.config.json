@@ -1,0 +1,136 @@
+{
+  "project": {
+    "name": "AIrchitect CLI",
+    "version": "1.0.0",
+    "description": "Advanced AI-powered development assistant CLI",
+    "author": "AIrchitect Team",
+    "license": "MIT"
+  },
+  "languages": {
+    "rust": {
+      "enabled": true,
+      "workspace": "./Cargo.toml",
+      "components": [
+        "core",
+        "ai-engine",
+        "memory-system",
+        "agent-framework",
+        "security",
+        "checkpoint",
+        "tui",
+        "providers",
+        "utils"
+      ]
+    },
+    "typescript": {
+      "enabled": true,
+      "workspace": "./package.json",
+      "components": [
+        "cli",
+        "tui",
+        "modes",
+        "agents",
+        "components"
+      ]
+    },
+    "python": {
+      "enabled": true,
+      "workspace": "./plugins/pyproject.toml",
+      "components": [
+        "core",
+        "example-plugin"
+      ]
+    }
+  },
+  "build": {
+    "output": "./dist",
+    "targets": {
+      "binary": "./target/release",
+      "bundle": "./dist/bundle",
+      "plugins": "./dist/plugins"
+    },
+    "scripts": {
+      "build": "./scripts/build.sh",
+      "test": "./scripts/test.sh",
+      "clean": "./scripts/clean.sh"
+    }
+  },
+  "runtime": {
+    "defaultMode": "planning",
+    "defaultProvider": "openai",
+    "providers": {
+      "openai": {
+        "enabled": true,
+        "models": ["gpt-4", "gpt-3.5-turbo"],
+        "defaultModel": "gpt-4"
+      },
+      "anthropic": {
+        "enabled": true,
+        "models": ["claude-3-opus", "claude-3-sonnet"],
+        "defaultModel": "claude-3-opus"
+      },
+      "google": {
+        "enabled": true,
+        "models": ["gemini-pro", "gemini-ultra"],
+        "defaultModel": "gemini-pro"
+      },
+      "qwen": {
+        "enabled": true,
+        "models": ["qwen-max", "qwen-plus"],
+        "defaultModel": "qwen-max"
+      }
+    }
+  },
+  "security": {
+    "encryption": {
+      "enabled": true,
+      "algorithm": "AES-256-GCM",
+      "keyDerivation": "PBKDF2"
+    },
+    "credentials": {
+      "storage": "keychain",
+      "encryption": true,
+      "rotation": {
+        "enabled": false,
+        "interval": "30d"
+      }
+    }
+  },
+  "performance": {
+    "cache": {
+      "enabled": true,
+      "size": "100MB",
+      "ttl": "1h"
+    },
+    "concurrency": {
+      "maxThreads": 8,
+      "maxConcurrentRequests": 10
+    }
+  },
+  "paths": {
+    "config": "./.config",
+    "cache": "./.cache",
+    "logs": "./.logs",
+    "data": "./.data",
+    "temp": "./.tmp"
+  },
+  "features": {
+    "checkpoint": {
+      "enabled": true,
+      "autoCheckpoint": true,
+      "maxCheckpoints": 50
+    },
+    "agentFramework": {
+      "enabled": true,
+      "maxParallelAgents": 5
+    },
+    "projectMemory": {
+      "enabled": true,
+      "vectorStore": "llamaindex"
+    },
+    "pluginSystem": {
+      "enabled": true,
+      "sandboxPlugins": true
+    }
+  }
+}

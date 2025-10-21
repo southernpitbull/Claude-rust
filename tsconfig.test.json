@@ -1,0 +1,78 @@
+{
+  // Test TypeScript configuration
+  // Extends base tsconfig.json with settings optimized for Jest testing
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Test-specific settings
+    "types": ["node", "jest"],
+    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "removeComments": false,
+
+    // Module system - use CommonJS for Jest compatibility
+    "module": "CommonJS",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+
+    // Allow more flexible module resolution for mocking
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    // Enable stricter checks in tests
+    "noUnusedLocals": false, // Allow unused variables in tests
+    "noUnusedParameters": false, // Allow unused parameters in tests
+    "strict": true,
+    "isolatedModules": true, // Required for ts-jest performance
+
+    // Module resolution
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@core/*": ["src/core/*"],
+      "@agents/*": ["src/agents/*"],
+      "@ui/*": ["src/tui/*"],
+      "@providers/*": ["src/providers/*"],
+      "@commands/*": ["src/commands/*"],
+      "@utils/*": ["src/utils/*"],
+      "@types/*": ["src/types/*"],
+      "@bindings/*": ["bindings/*"],
+      "@plugins/*": ["plugins/*"]
+    },
+
+    // Output for test compilation
+    "outDir": "./dist-test",
+    "incremental": true,
+    "tsBuildInfoFile": "./dist-test/.tsbuildinfo",
+
+    // Experimental features
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Skip library checks for faster compilation
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "target",
+    "venv"
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+[package]
+name = "ai-cli-agent-framework"
+version = "1.0.0"
+edition = "2021"
+authors = ["AIrchitect Team"]
+description = "Intelligent agent framework with LangGraph"
+license = "MIT"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+log = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+ai-cli-utils = { path = "../utils" }
+ai-cli-ai-engine = { path = "../ai-engine" }
+ai-cli-memory-system = { path = "../memory-system" }

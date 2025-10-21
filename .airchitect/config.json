@@ -1,0 +1,55 @@
+{
+  "ai": {
+    "default_provider": "openai",
+    "max_tokens": 8000,
+    "temperature": 0.7,
+    "model": "gpt-4",
+    "timeout_seconds": 60
+  },
+  "memory": {
+    "type": "chroma",
+    "url": "http://localhost:8000",
+    "enable_persistence": true,
+    "cleanup_interval_hours": 24
+  },
+  "providers": {
+    "openai": {
+      "api_key": "${OPENAI_API_KEY}",
+      "base_url": "https://api.openai.com/v1"
+    },
+    "anthropic": {
+      "api_key": "${ANTHROPIC_API_KEY}",
+      "max_tokens": 8000
+    },
+    "gemini": {
+      "api_key": "${GEMINI_API_KEY}"
+    },
+    "local": {
+      "ollama_url": "http://localhost:11434",
+      "lm_studio_url": "http://localhost:8000"
+    }
+  },
+  "agents": {
+    "max_parallel": 4,
+    "timeout_seconds": 300,
+    "enable_logging": true
+  },
+  "security": {
+    "enable_auth": true,
+    "jwt_secret": "${JWT_SECRET}",
+    "token_expiry_hours": 24,
+    "enable_audit_log": true,
+    "audit_log_path": "/var/log/airchitect/audit.log"
+  },
+  "checkpoint": {
+    "enabled": true,
+    "auto_backup_before_restore": true,
+    "backup_directory": "~/.airchitect/backups",
+    "max_checkpoints": 50
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "stdout"
+  }
+}

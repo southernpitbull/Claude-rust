@@ -1,0 +1,21 @@
+[package]
+name = "ai-cli-providers"
+version = "1.0.0"
+edition = "2021"
+authors = ["AIrchitect Team"]
+description = "AI provider adapters"
+license = "MIT"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+reqwest = { workspace = true }
+async-trait = { workspace = true }
+log = { workspace = true }
+uuid = { workspace = true }
+ai-cli-utils = { path = "../utils" }
+ai-cli-security = { path = "../security" }
+ai-cli-ai-engine = { path = "../ai-engine" }

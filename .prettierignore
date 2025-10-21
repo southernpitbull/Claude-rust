@@ -1,0 +1,39 @@
+# Prettier ignore file for AIrchitect CLI
+# Files and directories that should not be formatted
+
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist
+dist-test
+target
+*.tsbuildinfo
+
+# Python virtual environments
+venv
+__pycache__
+*.pyc
+
+# Generated files
+coverage
+*.log
+
+# Configuration files that have specific formatting
+*.json
+!tsconfig*.json
+!package.json
+
+# Markdown files with specific formatting
+CHANGELOG.md
+LICENSE
+
+# Binary and vendor files
+*.wasm
+*.exe
+*.dll
+*.so
+*.dylib

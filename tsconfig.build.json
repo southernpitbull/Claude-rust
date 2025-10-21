@@ -1,0 +1,39 @@
+{
+  // Production build TypeScript configuration
+  // Extends base tsconfig.json with optimizations for production builds
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Production-specific settings
+    "sourceMap": false,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
+    "stripInternal": true,
+
+    // Ensure clean output directory
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+
+    // Output optimizations
+    "noEmitOnError": true,
+    "importHelpers": true
+  },
+  "include": [
+    "src/**/*",
+    "bindings/**/*",
+    "plugins/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "target",
+    "venv",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "tests/**/*",
+    "*.config.ts"
+  ]
+}
